@@ -72,36 +72,6 @@ function App() {
     { n: "04", title: "Deploy", desc: "We ship, monitor, and iterate. Ongoing support as you scale." },
   ]
 
-  const work = [
-    {
-      category: "Automation",
-      client: "Global Logistics Co.",
-      title: "Cutting invoice processing time by 94%",
-      result: "94% faster",
-      metric: "Processing time reduced from 4 days to 4 hours",
-      gradient: "work-grad-1",
-      tag: "Document AI"
-    },
-    {
-      category: "Conversational AI",
-      client: "E-Commerce Platform",
-      title: "AI support agent handling 80% of tickets autonomously",
-      result: "80% resolved",
-      metric: "Without human intervention, 24/7",
-      gradient: "work-grad-2",
-      tag: "AI Chatbot"
-    },
-    {
-      category: "Data Intelligence",
-      client: "Retail Group — UAE",
-      title: "Predicting demand 3 weeks ahead with 91% accuracy",
-      result: "91% accuracy",
-      metric: "Inventory costs reduced by 38%",
-      gradient: "work-grad-3",
-      tag: "Predictive Analytics"
-    },
-  ]
-
   const techStack = [
     "GPT-4o", "Claude 3.5", "Gemini 2.0", "Llama 3", "Mistral",
     "LangChain", "Pinecone", "Supabase", "Vercel", "AWS",
@@ -143,49 +113,6 @@ function App() {
           ))}
         </div>
       </div>
-
-      {/* ── Work ─────────────────────────────────────── */}
-      <section className="work">
-        <div className="work-container">
-          <motion.div
-            className="work-header"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <p className="section-label" style={{ color: 'rgba(255,255,255,0.5)' }}>Selected work</p>
-            <h2 className="work-headline">
-              For building real AI products,<br />results are everything.
-            </h2>
-          </motion.div>
-
-          <div className="work-list">
-            {work.map((w, i) => (
-              <motion.div
-                key={i}
-                className={`work-card ${w.gradient}`}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: i * 0.1 }}
-              >
-                <div className="work-card-top">
-                  <span className="work-tag">{w.tag}</span>
-                  <span className="work-client">{w.client}</span>
-                </div>
-                <div className="work-card-body">
-                  <h3 className="work-title">{w.title}</h3>
-                </div>
-                <div className="work-card-result">
-                  <div className="work-result-value">{w.result}</div>
-                  <div className="work-result-label">{w.metric}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Services ─────────────────────────────────── */}
       <section id="services" className="services">
