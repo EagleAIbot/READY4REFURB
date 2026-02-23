@@ -45,15 +45,37 @@ body {
 }
 
 .nav-logo {
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-  transition: color 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.nav.scrolled .nav-logo {
-  color: #0a0a0a;
+.nav-logo-icon {
+  flex-shrink: 0;
+  transition: transform 0.6s ease;
+}
+
+.nav-logo:hover .nav-logo-icon {
+  transform: rotate(60deg);
+}
+
+.nav-logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #a855f7 0%, #818cf8 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: opacity 0.3s ease;
+}
+
+.nav.scrolled .nav-logo-text {
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #0891b2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .nav-cta {

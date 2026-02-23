@@ -84,7 +84,31 @@ function App() {
       {/* Navigation */}
       <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
         <div className="nav-container">
-          <div className="nav-logo">Art AI</div>
+          <div className="nav-logo">
+            {/* Orbital logomark */}
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="nav-logo-icon">
+              <defs>
+                <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#a855f7"/>
+                  <stop offset="100%" stopColor="#06b6d4"/>
+                </linearGradient>
+                <linearGradient id="lg2" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#818cf8"/>
+                  <stop offset="100%" stopColor="#a855f7"/>
+                </linearGradient>
+              </defs>
+              {/* Outer orbital ring */}
+              <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#lg1)" strokeWidth="1.2" fill="none" opacity="0.9"/>
+              {/* Inner orbital ring — tilted */}
+              <ellipse cx="16" cy="16" rx="6" ry="14" stroke="url(#lg2)" strokeWidth="1.2" fill="none" opacity="0.7"/>
+              {/* Centre node */}
+              <circle cx="16" cy="16" r="2.5" fill="url(#lg1)"/>
+              {/* Orbit dots */}
+              <circle cx="30" cy="16" r="1.5" fill="#a855f7" opacity="0.9"/>
+              <circle cx="16" cy="2"  r="1.2" fill="#06b6d4" opacity="0.8"/>
+            </svg>
+            <span className="nav-logo-text">Art AI</span>
+          </div>
           <a href="#contact" className="nav-cta">Let's Talk</a>
         </div>
       </nav>
