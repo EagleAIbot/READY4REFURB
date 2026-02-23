@@ -60,6 +60,45 @@ function App() {
 
       {/* Hero Section */}
       <section className="hero">
+        <div className="hero-bg-shapes">
+          <motion.div 
+            className="shape shape-1"
+            animate={{ 
+              y: [0, -20, 0],
+              rotate: [0, 5, 0]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="shape shape-2"
+            animate={{ 
+              y: [0, 20, 0],
+              rotate: [0, -5, 0]
+            }}
+            transition={{ 
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="shape shape-3"
+            animate={{ 
+              scale: [1, 1.1, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ 
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+        
         <div className="hero-container">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -95,6 +134,7 @@ function App() {
 
       {/* Services Section */}
       <section className="services">
+        <div className="services-bg-pattern"></div>
         <div className="services-container">
           <motion.div
             className="services-header"
@@ -120,6 +160,13 @@ function App() {
                 <div className="service-content">
                   <h3 className="service-title">{service.title}</h3>
                   <p className="service-description">{service.description}</p>
+                </div>
+                <div className="service-icon-bg">
+                  <motion.div
+                    className="service-icon-shape"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  />
                 </div>
               </motion.div>
             ))}
