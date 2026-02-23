@@ -1,7 +1,8 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Points, PointMaterial, MeshDistortMaterial, Line } from '@react-three/drei'
+import { Points, PointMaterial, MeshDistortMaterial, Line, Float, Environment } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
+import { useAppStore } from './store/useAppStore'
 import * as THREE from 'three'
 
 // ── Stars ─────────────────────────────────────────────────────────────────────
@@ -215,23 +216,30 @@ function AgentNodes({ center, count = 5, radius = 1.7, color = "#c084fc" }) {
   )
 }
 
-// ── Small floating debris ─────────────────────────────────────────────────────
-function Debris({ position, scale, speed, color = "#a855f7" }) {
+// ── Small floating debris — Float gives natural organic bobbing ───────────────
+function Debris({ position, scale, speed, color = "#a855f7", floatSpeed = 1 }) {
   const mesh = useRef()
-  const startY = position[1]
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
     mesh.current.rotation.x = t * speed * 0.8
     mesh.current.rotation.y = t * speed
-    mesh.current.position.y = startY + Math.sin(t * speed * 0.5) * 0.3
   })
   return (
-    <mesh ref={mesh} position={position} scale={scale}>
-      <icosahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={2.5}
-        wireframe transparent opacity={0.55} />
-    </mesh>
+    <Float speed={floatSpeed} rotationIntensity={0.15} floatIntensity={0.5}>
+      <mesh ref={mesh} position={position} scale={scale}>
+        <icosahedronGeometry args={[1, 0]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={2.5}
+          wireframe transparent opacity={0.55} />
+      </mesh>
+    </Float>
   )
+}
+
+// ── Fires when Three.js scene is mounted and ready ────────────────────────────
+function SceneReady() {
+  const setSceneLoaded = useAppStore((s) => s.setSceneLoaded)
+  useEffect(() => { setSceneLoaded() }, [])
+  return null
 }
 
 // ── Camera drift ──────────────────────────────────────────────────────────────
@@ -258,6 +266,11 @@ export default function HeroScene() {
       <pointLight position={[-8,  5,  5]} intensity={3}   color="#a855f7" />
       <pointLight position={[ 8, -4,  3]} intensity={1.5} color="#06b6d4" />
       <pointLight position={[ 0,  0,  6]} intensity={0.3} color="#ffffff" />
+
+      <Suspense fallback={null}>
+        <SceneReady />
+        <Environment preset="night" />
+      </Suspense>
 
       <Stars />
 

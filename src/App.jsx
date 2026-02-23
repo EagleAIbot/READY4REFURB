@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { gsap } from 'gsap'
+import { useAppStore } from './store/useAppStore'
 import { 
   ArrowRight, 
   Mail, 
@@ -24,11 +26,32 @@ function App() {
   const [formSubmitted, setFormSubmitted] = useState(false)
   const tickerRef = useRef(null)
 
+  const { sceneLoaded, setAnimationsReady, setFinished } = useAppStore()
+
+  // Scroll listener
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // State machine: sceneLoaded → animationsReady → isFinished
+  useEffect(() => {
+    if (!sceneLoaded) return
+    const t1 = setTimeout(() => setAnimationsReady(), 150)
+    const t2 = setTimeout(() => setFinished(), 1000)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [sceneLoaded])
+
+  // Hero text stagger — fires when animationsReady flips true
+  const animationsReady = useAppStore((s) => s.animationsReady)
+  useEffect(() => {
+    if (!animationsReady) return
+    const tl = gsap.timeline()
+    tl.fromTo('.hero-title',    { opacity: 0, y: 55 }, { opacity: 1, y: 0, duration: 1,   ease: 'power3.out' })
+      .fromTo('.hero-subtitle', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.55')
+      .fromTo('.hero-cta-wrap', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
+  }, [animationsReady])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -118,15 +141,15 @@ function App() {
       <section className="hero">
         <HeroScene />
         <div className="hero-container">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <div className="hero-title-wrap">
             <h1 className="hero-title">We build AI products<br />that work</h1>
-          </motion.div>
-          <motion.p className="hero-subtitle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>
+          </div>
+          <p className="hero-subtitle">
             Keeping costs low. Margins high. Results exceptional.
-          </motion.p>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>
+          </p>
+          <div className="hero-cta-wrap">
             <a href="#contact" className="hero-cta">Start a Project <ArrowRight size={18} /></a>
-          </motion.div>
+          </div>
         </div>
       </section>
 

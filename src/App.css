@@ -137,6 +137,13 @@ body {
   pointer-events: auto;
 }
 
+/* Hidden until GSAP stagger fires after scene load */
+.hero-title,
+.hero-subtitle,
+.hero-cta-wrap {
+  opacity: 0;
+}
+
 .hero-title {
   font-size: clamp(3.5rem, 9vw, 7rem);
   font-weight: 600;
