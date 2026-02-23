@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   ArrowRight, 
@@ -9,6 +9,14 @@ import {
 import './App.css'
 
 function App() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -51,7 +59,7 @@ function App() {
   return (
     <div className="app">
       {/* Navigation */}
-      <nav className="nav">
+      <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-logo">Art AI</div>
           <a href="#contact" className="nav-cta">Let's Talk</a>
@@ -224,7 +232,7 @@ function App() {
           >
             <h2 className="contact-title">Let's build something</h2>
             <p className="contact-subtitle">
-              Ready to transform your business with AI?
+              Tell us about your project and let's get to work.
             </p>
           </motion.div>
 
