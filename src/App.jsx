@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import HeroScene from './HeroScene'
 import StatsScene from './StatsScene'
+import { CounterStat } from './components/CounterStat'
 import './App.css'
 
 function App() {
@@ -193,7 +194,7 @@ function App() {
             { value: "GPT-4o +", label: "Using the world's most advanced AI models" },
           ].map((s, i) => (
             <motion.div key={i} className="stat-item" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.08 }}>
-              <div className="stat-value">{s.value}</div>
+              <CounterStat value={s.value} label={s.label} />
               <div className="stat-label">{s.label}</div>
             </motion.div>
           ))}

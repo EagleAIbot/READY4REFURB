@@ -36,3 +36,35 @@ html {
   background: #000000;
   color: #ffffff;
 }
+
+/* Hide default cursor on desktop */
+@media (pointer: fine) {
+  * { cursor: none !important; }
+}
+
+/* Custom cursor */
+.cursor-ring {
+  position: fixed;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  will-change: transform;
+  mix-blend-mode: difference;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.cursor-dot {
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a855f7;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  will-change: transform;
+}
