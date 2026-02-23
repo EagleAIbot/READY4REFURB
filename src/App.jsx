@@ -7,6 +7,7 @@ import {
   CheckCircle2
 } from 'lucide-react'
 import HeroScene from './HeroScene'
+import StatsScene from './StatsScene'
 import './App.css'
 
 function App() {
@@ -148,6 +149,7 @@ function App() {
 
       {/* Stats Section */}
       <section className="stats">
+        <StatsScene />
         <div className="stats-container">
           <motion.div
             className="stat-item"
