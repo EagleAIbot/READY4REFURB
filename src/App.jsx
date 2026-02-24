@@ -13,7 +13,9 @@ import {
   Bot,
   Search,
   FileText,
-  Workflow
+  Workflow,
+  Phone,
+  Database
 } from 'lucide-react'
 import HeroScene from './HeroScene'
 import StatsScene from './StatsScene'
@@ -24,6 +26,8 @@ function App() {
   const [scrolled, setScrolled] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' })
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [formLoading, setFormLoading] = useState(false)
+  const [formError, setFormError] = useState(false)
   const tickerRef = useRef(null)
 
   const { sceneLoaded, setAnimationsReady, setFinished } = useAppStore()
@@ -53,9 +57,26 @@ function App() {
       .fromTo('.hero-cta-wrap', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
   }, [animationsReady])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setFormSubmitted(true)
+    setFormLoading(true)
+    setFormError(false)
+    try {
+      const res = await fetch(`https://formspree.io/f/${import.meta.env.VITE_FORMSPREE_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      if (res.ok) {
+        setFormSubmitted(true)
+      } else {
+        setFormError(true)
+      }
+    } catch {
+      setFormError(true)
+    } finally {
+      setFormLoading(false)
+    }
   }
 
   const handleChange = (e) => {
@@ -65,28 +86,36 @@ function App() {
   const services = [
     {
       number: "01",
-      title: "AI Strategy",
-      description: "Strategic consulting to identify where AI delivers the biggest ROI in your business. We map the opportunity, build the roadmap, and keep costs minimal."
+      title: "Custom AI Models",
+      description: "Fine-tuned models, RAG pipelines, predictive systems, autonomous agents. If it involves building or deploying an AI model, we've done it. We work with GPT-4o, Claude, Llama, Mistral, and custom-trained architectures."
     },
     {
       number: "02",
-      title: "Product Development",
-      description: "End-to-end development of custom AI products — from initial concept through deployment. We build fast and iterate faster."
+      title: "Full Product Builds",
+      description: "End-to-end development of AI-powered products, from initial concept through to live deployment. We own the full stack: frontend, backend, model integration, infrastructure."
     },
     {
       number: "03",
       title: "Process Automation",
-      description: "Replace manual, repetitive work with intelligent automation. Cut operational costs dramatically while freeing your team to focus on what matters."
+      description: "Replace manual, repetitive work with intelligent automation. Multi-step workflows, browser agents, data pipelines, email sequences. We build systems that run themselves."
+    },
+    {
+      number: "04",
+      title: "AI Strategy",
+      description: "Not sure where AI fits in your business? We map the opportunity, identify the highest-ROI use cases, build the roadmap, and give you a clear picture of cost and timeline before you commit to anything."
     }
   ]
 
   const useCases = [
     { icon: MessageSquare, title: "AI Chatbots", desc: "Customer support, lead qualification, and sales automation that works 24/7" },
     { icon: FileText, title: "Document AI", desc: "Extract, analyse, and act on data from contracts, invoices, and reports instantly" },
-    { icon: BarChart3, title: "Predictive Analytics", desc: "Forecast demand, detect risk, and surface insights your team can act on" },
-    { icon: Search, title: "AI Search", desc: "Semantic search across your internal knowledge base or product catalogue" },
-    { icon: Workflow, title: "Workflow Automation", desc: "Connect your tools and automate complex multi-step business processes" },
-    { icon: Bot, title: "Custom LLM Solutions", desc: "Fine-tuned models and RAG pipelines trained on your proprietary data" },
+    { icon: BarChart3, title: "Predictive Models", desc: "Demand forecasting, pricing engines, risk scoring. Models trained on your actual data." },
+    { icon: Search, title: "AI Search", desc: "Semantic search across your internal knowledge base, product catalogue, or document store" },
+    { icon: Workflow, title: "Workflow Automation", desc: "Multi-step business processes automated end-to-end, from data ingestion to output delivery." },
+    { icon: Bot, title: "Custom LLM Solutions", desc: "Fine-tuned models and RAG pipelines trained on your proprietary data and domain knowledge" },
+    { icon: Zap, title: "AI Agents", desc: "Autonomous pipelines that research, act, and deliver results without human input. Like having an employee that never sleeps." },
+    { icon: Phone, title: "Voice AI", desc: "Phone agents that handle inbound calls, answer questions, and book appointments around the clock" },
+    { icon: Database, title: "Data Pipelines", desc: "Ingest, clean, and structure messy data so your models have something solid to work with" },
   ]
 
   const process = [
@@ -131,7 +160,7 @@ function App() {
               <circle cx="30" cy="16" r="1.5" fill="#a855f7" opacity="0.9"/>
               <circle cx="16" cy="2"  r="1.2" fill="#06b6d4" opacity="0.8"/>
             </svg>
-            <span className="nav-logo-text">Art AI</span>
+            <span className="nav-logo-text">Shift AI</span>
           </div>
           <a href="#contact" className="nav-cta">Let's Talk</a>
         </div>
@@ -145,7 +174,7 @@ function App() {
             <h1 className="hero-title">We build AI products<br />that work</h1>
           </div>
           <p className="hero-subtitle">
-            Keeping costs low. Margins high. Results exceptional.
+            Custom models. Full products. Total automation.<br />Whatever AI you need, we build it.
           </p>
           <div className="hero-cta-wrap">
             <a href="#contact" className="hero-cta">Start a Project <ArrowRight size={18} /></a>
@@ -188,7 +217,7 @@ function App() {
         <div className="use-cases-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <p className="section-label">What we build</p>
-            <h2 className="section-title">AI solutions for every problem</h2>
+            <h2 className="section-title">If it runs on AI, we build it</h2>
           </motion.div>
           <div className="use-cases-grid">
             {useCases.map((u, i) => (
@@ -209,12 +238,12 @@ function App() {
         <StatsScene />
         <div className="stats-container">
           {[
-            { value: "4×", label: "Average cost reduction vs traditional agencies" },
-            { value: "< 4wks", label: "From brief to live product" },
-            { value: "UAE", label: "Incorporated in Dubai — tax efficient, globally billed" },
+            { value: "Day 1", label: "Useful output from day one. No lengthy onboarding." },
+            { value: "Weeks", label: "Typical time from brief to working prototype" },
+            { value: "UK", label: "Based in the UK, working with businesses across Britain." },
             { value: "24/7", label: "AI systems that work while you sleep" },
-            { value: "100%", label: "Founder-led — you talk to the people building it" },
-            { value: "GPT-4o +", label: "Using the world's most advanced AI models" },
+            { value: "100%", label: "Founder-led. You talk directly to the people building it." },
+            { value: "Frontier", label: "GPT-4o, Claude, Gemini, Llama. Always the best model for the job." },
           ].map((s, i) => (
             <motion.div key={i} className="stat-item" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.08 }}>
               <CounterStat value={s.value} label={s.label} />
@@ -248,8 +277,70 @@ function App() {
         <div className="cta-band-container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <h2 className="cta-band-title">Ready to cut costs<br />and build smarter?</h2>
-            <p className="cta-band-sub">Most projects go live in under 4 weeks. No retainers. No nonsense.</p>
+            <p className="cta-band-sub">One-off projects or ongoing retainers. No account managers. No nonsense.</p>
             <a href="#contact" className="cta-band-btn">Get a free consultation <ArrowRight size={18} /></a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Local Business ───────────────────────────── */}
+      <section id="local-business" className="local-biz">
+        <div className="local-biz-container">
+          <motion.div className="local-biz-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <p className="section-label local-biz-label">For UK local businesses</p>
+            <h2 className="local-biz-title">Something on your website<br />is costing you customers.</h2>
+            <p className="local-biz-intro">
+              Most local businesses we work with (dentists, gyms, roofers, electricians, salons) are losing 2 to 5 enquiries a week without knowing it. Slow site, not showing up on Google, no way to book out of hours. We audit your digital presence for free and tell you exactly what's happening. Then we fix it.
+            </p>
+          </motion.div>
+
+          <div className="local-biz-steps">
+            {[
+              {
+                n: "01",
+                title: "Free audit, 48 hours",
+                desc: "We look at your website speed, Google Business Profile, local search rankings, online booking, and reviews. You get a plain-English report back in 48 hours. No jargon, no obligation, no sales pitch."
+              },
+              {
+                n: "02",
+                title: "We fix what's broken",
+                desc: "Site too slow? We'll fix it. Not showing up on Google Maps? We'll sort your listing. No way for customers to book or enquire online? We'll build that. Every fix is priced upfront with no surprises."
+              },
+              {
+                n: "03",
+                title: "AI receptionist",
+                desc: "An AI that answers your phone, handles common questions, and books appointments, even at 11pm on a Sunday. You stop losing jobs to voicemail. Set up in a week, runs itself after that."
+              }
+            ].map((step, i) => (
+              <motion.div key={i} className="local-biz-step" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
+                <div className="local-biz-step-num">{step.n}</div>
+                <h3 className="local-biz-step-title">{step.title}</h3>
+                <p className="local-biz-step-desc">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div className="local-biz-pricing" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
+            <p className="local-biz-pricing-label">What it costs</p>
+            <div className="local-biz-pricing-grid">
+              {[
+                { service: "Digital audit + full report", price: "Free" },
+                { service: "Google listing fix + profile setup", price: "From £200" },
+                { service: "New website (fast, mobile, converts)", price: "From £1,500" },
+                { service: "AI receptionist", price: "From £300/month" },
+                { service: "SEO + ongoing maintenance", price: "From £200/month" },
+              ].map((row, i) => (
+                <div key={i} className="local-biz-pricing-row">
+                  <span className="local-biz-pricing-service">{row.service}</span>
+                  <span className="local-biz-pricing-price">{row.price}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div className="local-biz-cta" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
+            <a href="#contact" className="local-biz-btn">Get your free audit <ArrowRight size={18} /></a>
+            <span className="local-biz-note">No commitment. 48-hour turnaround. Plain English results.</span>
           </motion.div>
         </div>
       </section>
@@ -258,20 +349,65 @@ function App() {
       <section className="why-us">
         <div className="why-us-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label">Why Art AI</p>
+            <p className="section-label">Why Shift AI</p>
             <h2 className="section-title">We're different</h2>
           </motion.div>
           <div className="why-grid">
             {[
-              { title: "UAE-based, globally delivered", desc: "Incorporated in Dubai FZCO — favourable tax, global contracts, fast invoicing." },
-              { title: "Costs you'll actually love", desc: "We build lean. No enterprise bloat, no inflated agency margins. You keep the value." },
-              { title: "Founder-led", desc: "You work directly with the people building your product. No account managers in the way." },
-              { title: "Speed is the product", desc: "We've shipped AI products in days. When you need to move fast, we move fast." },
+              { title: "UK-based, founder-run", desc: "We're a small UK team. When you contact us, you talk to the person who'll actually do the work. No handoffs, no account managers." },
+              { title: "We build the full stack", desc: "Custom models, automations, voice agents, full products, local business tools. We do all of it. You don't need five different agencies." },
+              { title: "Costs you'll actually like", desc: "We build lean. No enterprise bloat, no inflated margins. Pay per project, keep the value." },
+              { title: "Speed is the product", desc: "We've shipped working AI systems in days. When you need to move fast, we move fast." },
             ].map((w, i) => (
               <motion.div key={i} className="why-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
                 <div className="why-dot" />
                 <h3 className="why-title">{w.title}</h3>
                 <p className="why-desc">{w.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Scenarios ────────────────────────────────── */}
+      <section className="scenarios">
+        <div className="scenarios-container">
+          <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <p className="section-label">Real problems we solve</p>
+            <h2 className="section-title">What this looks like in practice</h2>
+          </motion.div>
+          <div className="scenarios-grid">
+            {[
+              {
+                type: "Local business",
+                problem: "A dental practice in Manchester had no online booking, a site that took 5 seconds to load on mobile, and three unanswered Google reviews. They had no idea how many enquiries they were losing.",
+                built: "We audited the site, fixed their Google Business Profile, integrated an online booking system, and set up an AI receptionist for out-of-hours calls.",
+                outcome: "£2,100 upfront. £300/month ongoing."
+              },
+              {
+                type: "AI product",
+                problem: "A UK startup needed a recommendation engine to surface the right products to each visitor based on browsing behaviour — without a data science team to build or maintain it.",
+                built: "We built a RAG-based recommendation pipeline trained on their product catalogue and user data. Integrated directly into their existing platform with no infrastructure changes needed.",
+                outcome: "Delivered in under 3 weeks."
+              },
+              {
+                type: "Process automation",
+                problem: "A professional services firm had hundreds of client contracts in a shared drive. Finding key clauses, flagging renewals, and answering basic contract questions took hours of manual work every week.",
+                built: "We built a document AI pipeline that ingests their contracts, extracts key terms, flags upcoming renewals, and answers plain-English questions about any document instantly.",
+                outcome: "3+ hours saved per week from day one."
+              }
+            ].map((s, i) => (
+              <motion.div key={i} className="scenario-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
+                <div className="scenario-type">{s.type}</div>
+                <div className="scenario-block">
+                  <p className="scenario-label">The problem</p>
+                  <p className="scenario-text">{s.problem}</p>
+                </div>
+                <div className="scenario-block">
+                  <p className="scenario-label">What we built</p>
+                  <p className="scenario-text">{s.built}</p>
+                </div>
+                <div className="scenario-outcome">{s.outcome}</div>
               </motion.div>
             ))}
           </div>
@@ -290,11 +426,11 @@ function App() {
             <motion.div className="contact-info" initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               <div className="contact-item">
                 <Mail size={20} />
-                <a href="mailto:hello@artai.com">hello@artai.com</a>
+                <a href="mailto:hello@shiftaitech.com">hello@shiftaitech.com</a>
               </div>
               <div className="contact-item">
                 <MapPin size={20} />
-                <span>Dubai, UAE</span>
+                <span>United Kingdom</span>
               </div>
               <div className="contact-turnaround">
                 <Zap size={16} />
@@ -318,9 +454,12 @@ function App() {
                   <div className="form-group">
                     <textarea name="message" value={formData.message} onChange={handleChange} required rows="5" placeholder="Tell us about your project" />
                   </div>
-                  <button type="submit" className="form-submit">
-                    Send Message <ArrowRight size={18} />
+                  <button type="submit" className="form-submit" disabled={formLoading}>
+                    {formLoading ? 'Sending…' : <><span>Send Message</span> <ArrowRight size={18} /></>}
                   </button>
+                  {formError && (
+                    <p className="form-error">Something went wrong. Please email us directly at <a href="mailto:hello@shiftaitech.com">hello@shiftaitech.com</a></p>
+                  )}
                 </form>
               ) : (
                 <motion.div className="form-success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
@@ -340,8 +479,8 @@ function App() {
       {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
-          <div className="footer-logo">Art AI</div>
-          <p className="footer-text">© 2026 Art AI FZCO — Dubai, UAE</p>
+          <div className="footer-logo">Shift AI</div>
+          <p className="footer-text">© 2026 Shift AI — United Kingdom</p>
         </div>
       </footer>
 

@@ -34,7 +34,7 @@ export function LoadingScreen() {
         <circle  cx="30" cy="16" r="1.5" fill="#a855f7" opacity="0.9"/>
         <circle  cx="16" cy="2"  r="1.2" fill="#06b6d4" opacity="0.8"/>
       </svg>
-      <p className="loading-label">Art AI</p>
+      <p className="loading-label">Shift AI</p>
     </div>
   )
 }
