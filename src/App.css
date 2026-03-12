@@ -123,7 +123,6 @@ body {
 /* ── Mobile hero: real bathroom photo ── */
 @media (max-width: 768px) {
   .hero {
-    background-image: url('/images/IMG_4301.png');
     background-size: cover;
     background-position: center 20%;
     align-items: flex-end;

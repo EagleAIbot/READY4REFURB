@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+const BASE = import.meta.env.BASE_URL
+const img = (name) => `${BASE}images/${name}`
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { useAppStore } from './store/useAppStore'
@@ -167,7 +169,7 @@ function App() {
       <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-logo">
-            <img src="/images/r4r-logo.png" alt="R4R" className="nav-logo-icon" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+            <img src={img('r4r-logo.png')} alt="R4R" className="nav-logo-icon" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
             <span className="nav-logo-text">Ready For Refurb</span>
           </div>
           <a href="#contact" className="nav-cta">Get a Quote</a>
@@ -175,7 +177,7 @@ function App() {
       </nav>
 
       {/* ── Hero ──────────────────────────────────────── */}
-      <section className="hero">
+      <section className="hero" style={window.innerWidth <= 768 ? { backgroundImage: `url(${img('IMG_4301.png')})` } : {}}>
         <HeroScene />
         <div className="hero-container">
           <div className="hero-title-wrap">
@@ -300,17 +302,17 @@ function App() {
           </motion.div>
           <div className="gallery-grid">
             {[
-              { src: '/images/IMG_4581.jpeg', alt: 'Luxury black marble ensuite with LED shelves', large: true },
-              { src: '/images/IMG_4301.png',  alt: 'Onyx stone walk-in shower' },
-              { src: '/images/IMG_3767.jpeg', alt: 'Freestanding bath and walk-in shower' },
-              { src: '/images/IMG_3078.jpeg', alt: 'Modern dark grey ensuite' },
-              { src: '/images/IMG_4531.jpeg', alt: 'Contemporary fitted family bathroom' },
-              { src: '/images/IMG_4072.jpeg', alt: 'Walk-in shower with recessed niche' },
-              { src: '/images/IMG_3720.jpeg', alt: 'Cream marble shower enclosure' },
-              { src: '/images/IMG_4563.jpeg', alt: 'Modern cloakroom' },
-              { src: '/images/IMG_3410.jpeg', alt: 'Family bathroom with rainfall shower' },
-              { src: '/images/IMG_3085.jpeg', alt: 'Dark grey shower detail' },
-              { src: '/images/IMG_3256.jpeg', alt: 'Powder room with patterned floor tiles' },
+              { src: img('IMG_4581.jpeg'), alt: 'Luxury black marble ensuite with LED shelves', large: true },
+              { src: img('IMG_4301.png'),  alt: 'Onyx stone walk-in shower' },
+              { src: img('IMG_3767.jpeg'), alt: 'Freestanding bath and walk-in shower' },
+              { src: img('IMG_3078.jpeg'), alt: 'Modern dark grey ensuite' },
+              { src: img('IMG_4531.jpeg'), alt: 'Contemporary fitted family bathroom' },
+              { src: img('IMG_4072.jpeg'), alt: 'Walk-in shower with recessed niche' },
+              { src: img('IMG_3720.jpeg'), alt: 'Cream marble shower enclosure' },
+              { src: img('IMG_4563.jpeg'), alt: 'Modern cloakroom' },
+              { src: img('IMG_3410.jpeg'), alt: 'Family bathroom with rainfall shower' },
+              { src: img('IMG_3085.jpeg'), alt: 'Dark grey shower detail' },
+              { src: img('IMG_3256.jpeg'), alt: 'Powder room with patterned floor tiles' },
             ].map((img, i) => (
               <motion.div
                 key={i}

@@ -39,7 +39,7 @@ export default function QuotePage() {
       {/* Header */}
       <header className="qp-header">
         <div className="qp-header-left">
-          <img src="/images/r4r-logo.png" alt="Ready For Refurb" className="qp-logo" />
+          <img src={`${import.meta.env.BASE_URL}images/r4r-logo.png`} alt="Ready For Refurb" className="qp-logo" />
           <span className="qp-brand">Ready For Refurb</span>
         </div>
         <a href="https://eagleaibot.github.io/READY4REFURB/" className="qp-site-btn">
@@ -72,9 +72,9 @@ export default function QuotePage() {
 
           <div className="qp-gallery">
             {[
-              '/images/IMG_4581.jpeg',
-              '/images/IMG_3767.jpeg',
-              '/images/IMG_4072.jpeg',
+              `${import.meta.env.BASE_URL}images/IMG_4581.jpeg`,
+              `${import.meta.env.BASE_URL}images/IMG_3767.jpeg`,
+              `${import.meta.env.BASE_URL}images/IMG_4072.jpeg`,
             ].map((src, i) => (
               <div key={i} className="qp-gallery-thumb">
                 <img src={src} alt="R4R bathroom project" loading="lazy" />

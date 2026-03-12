@@ -21,7 +21,7 @@ export function LoadingScreen() {
   return (
     <div ref={ref} className="loading-screen">
       <img
-        src="/images/r4r-logo.png"
+        src={`${import.meta.env.BASE_URL}images/r4r-logo.png`}
         alt="Ready For Refurb"
         className="loading-icon"
         style={{ width: 90, height: 90, borderRadius: '50%' }}
