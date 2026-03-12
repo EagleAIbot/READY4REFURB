@@ -59,9 +59,10 @@ function App() {
   useEffect(() => {
     if (!animationsReady) return
     const tl = gsap.timeline()
-    tl.fromTo('.hero-title',    { opacity: 0, y: 55 }, { opacity: 1, y: 0, duration: 1,   ease: 'power3.out' })
-      .fromTo('.hero-subtitle', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.55')
-      .fromTo('.hero-cta-wrap', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
+    tl.fromTo('.hero-title',         { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 1,   ease: 'power3.out' })
+      .fromTo('.hero-cta-wrap',      { opacity: 0, y:  20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
+      .fromTo('.hero-right-headline',{ opacity: 0, x:  40 }, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out' }, '-=0.9')
+      .fromTo('.hero-right-sub',     { opacity: 0, x:  40 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
   }, [animationsReady])
 
   const handleSubmit = async (e) => {
@@ -177,18 +178,19 @@ function App() {
       </nav>
 
       {/* ── Hero ──────────────────────────────────────── */}
-      <section className="hero" style={window.innerWidth <= 768 ? { backgroundImage: `url(${img('IMG_4301.png')})` } : {}}>
+      <section className="hero">
         <HeroScene />
-        <div className="hero-container">
-          <div className="hero-title-wrap">
-            <h1 className="hero-title">Bathrooms built<br />to last</h1>
-          </div>
-          <p className="hero-subtitle">
-            Bathrooms, kitchens, carpentry, plastering.<br />Whatever your home needs, we do it right.
-          </p>
+        {/* Left — main headline */}
+        <div className="hero-left">
+          <h1 className="hero-title">Bathrooms<br />built to last</h1>
           <div className="hero-cta-wrap">
             <a href="#contact" className="hero-cta">Get a Free Quote <ArrowRight size={18} /></a>
           </div>
+        </div>
+        {/* Right — secondary message */}
+        <div className="hero-right">
+          <p className="hero-right-headline">We don't just<br />do bathrooms.</p>
+          <p className="hero-right-sub">Kitchens, carpentry,<br />plastering, tiling —<br />whatever it needs.</p>
         </div>
       </section>
 
