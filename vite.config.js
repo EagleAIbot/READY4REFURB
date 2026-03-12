@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/r4r-bathrooms/',
+  base: '/READY4REFURB/',
   server: {
     historyApiFallback: true,
   },

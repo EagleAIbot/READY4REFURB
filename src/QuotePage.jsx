@@ -42,7 +42,7 @@ export default function QuotePage() {
           <img src="/images/r4r-logo.png" alt="Ready For Refurb" className="qp-logo" />
           <span className="qp-brand">Ready For Refurb</span>
         </div>
-        <a href="https://eagleaibot.github.io/r4r-bathrooms/" className="qp-site-btn">
+        <a href="https://eagleaibot.github.io/READY4REFURB/" className="qp-site-btn">
           View full website <ArrowRight size={15} />
         </a>
       </header>

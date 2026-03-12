@@ -12,7 +12,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "homepage": "https://eagleaibot.github.io/r4r-bathrooms",
+  "homepage": "https://eagleaibot.github.io/READY4REFURB",
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
