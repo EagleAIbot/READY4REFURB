@@ -7,7 +7,7 @@ import { LenisProvider } from './components/LenisProvider.jsx'
 import { MagneticCursor } from './components/MagneticCursor.jsx'
 import { LoadingScreen } from './components/LoadingScreen.jsx'
 
-const isQuotePage = window.location.pathname === '/quote'
+const isQuotePage = window.location.pathname.endsWith('/quote') || window.location.pathname.endsWith('/quote/')
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
