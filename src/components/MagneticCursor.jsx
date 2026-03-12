@@ -10,7 +10,6 @@ export function MagneticCursor() {
     const dot  = dotRef.current
     if (!ring || !dot) return
 
-    // Hide on mobile
     if (window.matchMedia('(pointer: coarse)').matches) {
       ring.style.display = 'none'
       dot.style.display  = 'none'
@@ -24,15 +23,15 @@ export function MagneticCursor() {
 
     const onEnter = () => gsap.to(ring, {
       scale: 2.8,
-      borderColor: '#a855f7',
-      backgroundColor: 'rgba(168,85,247,0.08)',
+      borderColor: '#3FB8E0',
+      backgroundColor: 'rgba(63,184,224,0.08)',
       duration: 0.35,
       ease: 'power2.out'
     })
 
     const onLeave = () => gsap.to(ring, {
       scale: 1,
-      borderColor: 'rgba(255,255,255,0.5)',
+      borderColor: 'rgba(63,184,224,0.5)',
       backgroundColor: 'transparent',
       duration: 0.35,
       ease: 'power2.out'
@@ -53,7 +52,6 @@ export function MagneticCursor() {
     }
 
     addListeners()
-    // Re-attach after any React re-renders
     const observer = new MutationObserver(addListeners)
     observer.observe(document.body, { childList: true, subtree: true })
 

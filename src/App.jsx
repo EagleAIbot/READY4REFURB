@@ -2,44 +2,51 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { useAppStore } from './store/useAppStore'
-import { 
-  ArrowRight, 
-  Mail, 
+import {
+  ArrowRight,
+  Mail,
   MapPin,
-  CheckCircle2,
-  MessageSquare,
-  Zap,
-  BarChart3,
-  Bot,
-  Search,
-  FileText,
-  Workflow,
   Phone,
-  Database
+  CheckCircle2,
+  Zap,
+  Layers,
+  Droplets,
+  Grid3x3,
+  Wrench,
+  Paintbrush,
+  Bath,
+  Shield,
+  Clock,
+  Star,
+  ChevronRight,
+  Hammer,
+  UtensilsCrossed,
+  Home,
+  Brush,
+  Drill,
+  LayoutDashboard,
 } from 'lucide-react'
 import HeroScene from './HeroScene'
 import StatsScene from './StatsScene'
 import { CounterStat } from './components/CounterStat'
+import { HeroRainOverlay } from './components/HeroRainOverlay'
 import './App.css'
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', town: '', workRequired: '', budget: '', message: '' })
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState(false)
-  const tickerRef = useRef(null)
 
   const { sceneLoaded, setAnimationsReady, setFinished } = useAppStore()
 
-  // Scroll listener
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // State machine: sceneLoaded → animationsReady → isFinished
   useEffect(() => {
     if (!sceneLoaded) return
     const t1 = setTimeout(() => setAnimationsReady(), 150)
@@ -47,7 +54,6 @@ function App() {
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [sceneLoaded])
 
-  // Hero text stagger — fires when animationsReady flips true
   const animationsReady = useAppStore((s) => s.animationsReady)
   useEffect(() => {
     if (!animationsReady) return
@@ -62,7 +68,7 @@ function App() {
     setFormLoading(true)
     setFormError(false)
     try {
-      const res = await fetch(`https://formspree.io/f/${import.meta.env.VITE_FORMSPREE_ID}`, {
+      const res = await fetch('https://formsubmit.co/ajax/ready4refurb@gmail.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(formData),
@@ -86,49 +92,73 @@ function App() {
   const services = [
     {
       number: "01",
-      title: "Custom AI Models",
-      description: "Fine-tuned models, RAG pipelines, predictive systems, autonomous agents. If it involves building or deploying an AI model, we've done it. We work with GPT-4o, Claude, Llama, Mistral, and custom-trained architectures."
+      title: "Full Bathroom Installations",
+      description: "From stripping out the old to fitting the final fixture, we handle every stage of a complete bathroom transformation. One team. One job. No subcontractors left unmanaged."
     },
     {
       number: "02",
-      title: "Full Product Builds",
-      description: "End-to-end development of AI-powered products, from initial concept through to live deployment. We own the full stack: frontend, backend, model integration, infrastructure."
+      title: "Wet Rooms & Walk-In Showers",
+      description: "Tanked, tiled, and fitted to the highest waterproofing standards. Whether it's a full wet room or a frameless walk-in enclosure, we make it watertight and stunning."
     },
     {
       number: "03",
-      title: "Process Automation",
-      description: "Replace manual, repetitive work with intelligent automation. Multi-step workflows, browser agents, data pipelines, email sequences. We build systems that run themselves."
+      title: "Tiling",
+      description: "Large-format tiles, feature walls, intricate patterns. Our tilers are skilled in every format - rectified porcelain, natural stone, metro, herringbone. Perfect finish every time."
     },
     {
       number: "04",
-      title: "AI Strategy",
-      description: "Not sure where AI fits in your business? We map the opportunity, identify the highest-ROI use cases, build the roadmap, and give you a clear picture of cost and timeline before you commit to anything."
-    }
+      title: "Plumbing & Supply",
+      description: "Full plumbing work including shower valves, underfloor heating, heated towel rails, and all pipework. We also supply bathroom furniture and sanitaryware at trade prices."
+    },
+    {
+      number: "05",
+      title: "Kitchen Fitting",
+      description: "From full kitchen installations to replacing doors, worktops, and splashbacks. We work with your units or source them for you - measured, fitted, and finished properly."
+    },
+    {
+      number: "06",
+      title: "Carpentry & Joinery",
+      description: "Stud walls, boxing in, fitted furniture, skirting, architrave, and bespoke timber work. Whether it's creating a hidden pipe chase or a built-in vanity unit, we build it right."
+    },
+    {
+      number: "07",
+      title: "Plastering",
+      description: "Smooth finish plaster, dry lining, patching, and full room replasters. We leave walls ready for tiling or decorating - flat, clean, and properly prepared."
+    },
+    {
+      number: "08",
+      title: "General Home Improvements",
+      description: "Odd jobs, home refurbishments, and property makeovers. If it needs doing in your home, chances are we can do it - or we know a trusted trade who can."
+    },
   ]
 
-  const useCases = [
-    { icon: MessageSquare, title: "AI Chatbots", desc: "Customer support, lead qualification, and sales automation that works 24/7" },
-    { icon: FileText, title: "Document AI", desc: "Extract, analyse, and act on data from contracts, invoices, and reports instantly" },
-    { icon: BarChart3, title: "Predictive Models", desc: "Demand forecasting, pricing engines, risk scoring. Models trained on your actual data." },
-    { icon: Search, title: "AI Search", desc: "Semantic search across your internal knowledge base, product catalogue, or document store" },
-    { icon: Workflow, title: "Workflow Automation", desc: "Multi-step business processes automated end-to-end, from data ingestion to output delivery." },
-    { icon: Bot, title: "Custom LLM Solutions", desc: "Fine-tuned models and RAG pipelines trained on your proprietary data and domain knowledge" },
-    { icon: Zap, title: "AI Agents", desc: "Autonomous pipelines that research, act, and deliver results without human input. Like having an employee that never sleeps." },
-    { icon: Phone, title: "Voice AI", desc: "Phone agents that handle inbound calls, answer questions, and book appointments around the clock" },
-    { icon: Database, title: "Data Pipelines", desc: "Ingest, clean, and structure messy data so your models have something solid to work with" },
+  const workTypes = [
+    { icon: Bath,            title: "Full Bathrooms",        desc: "Complete strip-out and full refits from floor to ceiling" },
+    { icon: Droplets,        title: "Wet Rooms",             desc: "Fully tanked and waterproofed wet rooms and walk-in showers" },
+    { icon: Grid3x3,         title: "Tiling",                desc: "Large format, stone, metro, feature walls - any format, any pattern" },
+    { icon: Wrench,          title: "Plumbing",              desc: "Valves, underfloor heating, towel rails, and all pipework" },
+    { icon: Layers,          title: "En Suites",             desc: "Compact en suites designed to maximise every centimetre of space" },
+    { icon: Shield,          title: "Supply & Fit",          desc: "Trade-priced sanitaryware, furniture, and tiles sourced and fitted" },
+    { icon: UtensilsCrossed, title: "Kitchen Fitting",       desc: "Full kitchen installations, worktops, splashbacks, and units" },
+    { icon: Hammer,          title: "Carpentry & Joinery",   desc: "Stud walls, boxing in, fitted furniture, and bespoke timber work" },
+    { icon: Brush,           title: "Plastering",            desc: "Full replasters, patching, and skim coats - ready for tiles or paint" },
+    { icon: LayoutDashboard, title: "Kitchens",              desc: "Measured, fitted, and finished - units, worktops, and all the detail" },
+    { icon: Home,            title: "Home Improvements",     desc: "Refurbs, odd jobs, and property makeovers done properly" },
+    { icon: Paintbrush,      title: "Design & Consult",      desc: "We help you plan the space, choose materials, and get it right first time" },
   ]
 
   const process = [
-    { n: "01", title: "Brief", desc: "We listen. Understand your goals, constraints, and where AI fits." },
-    { n: "02", title: "Design", desc: "We design the solution architecture and agree scope and cost upfront." },
-    { n: "03", title: "Build", desc: "Rapid development using the best AI tools available. No bloat, no waste." },
-    { n: "04", title: "Deploy", desc: "We ship, monitor, and iterate. Ongoing support as you scale." },
+    { n: "01", title: "Survey",  desc: "We visit, measure, and understand exactly what you want. No pressure, no hard sell." },
+    { n: "02", title: "Design",  desc: "We help you plan the layout, choose materials, and agree the full scope and price." },
+    { n: "03", title: "Supply",  desc: "We source everything at trade price. You save on materials without the legwork." },
+    { n: "04", title: "Install", desc: "Our team fits it properly, tidies up daily, and doesn't leave until it's perfect." },
   ]
 
-  const techStack = [
-    "GPT-4o", "Claude 3.5", "Gemini 2.0", "Llama 3", "Mistral",
-    "LangChain", "Pinecone", "Supabase", "Vercel", "AWS",
-    "OpenAI API", "Anthropic API", "Whisper", "DALL·E 3", "Midjourney",
+  const materials = [
+    "Porcelain", "Natural Stone", "Herringbone", "Metro Tile", "Quartz",
+    "Walk-In Shower", "Freestanding Bath", "Underfloor Heating", "Frameless Glass",
+    "Towel Rail", "Feature Wall", "Wet Room", "Resin Floor", "Large Format",
+    "Kitchen Fitting", "Carpentry", "Plastering", "Joinery", "Home Improvements",
   ]
 
   return (
@@ -138,60 +168,40 @@ function App() {
       <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-logo">
-            {/* Orbital logomark */}
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="nav-logo-icon">
-              <defs>
-                <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#a855f7"/>
-                  <stop offset="100%" stopColor="#06b6d4"/>
-                </linearGradient>
-                <linearGradient id="lg2" x1="100%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#818cf8"/>
-                  <stop offset="100%" stopColor="#a855f7"/>
-                </linearGradient>
-              </defs>
-              {/* Outer orbital ring */}
-              <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#lg1)" strokeWidth="1.2" fill="none" opacity="0.9"/>
-              {/* Inner orbital ring — tilted */}
-              <ellipse cx="16" cy="16" rx="6" ry="14" stroke="url(#lg2)" strokeWidth="1.2" fill="none" opacity="0.7"/>
-              {/* Centre node */}
-              <circle cx="16" cy="16" r="2.5" fill="url(#lg1)"/>
-              {/* Orbit dots */}
-              <circle cx="30" cy="16" r="1.5" fill="#a855f7" opacity="0.9"/>
-              <circle cx="16" cy="2"  r="1.2" fill="#06b6d4" opacity="0.8"/>
-            </svg>
-            <span className="nav-logo-text">Shift AI Tech</span>
+            <img src="/images/r4r-logo.png" alt="R4R" className="nav-logo-icon" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+            <span className="nav-logo-text">Ready For Refurb</span>
           </div>
-          <a href="#contact" className="nav-cta">Let's Talk</a>
+          <a href="#contact" className="nav-cta">Get a Quote</a>
         </div>
       </nav>
 
-      {/* ── Hero ─────────────────────────────────────── */}
+      {/* ── Hero ──────────────────────────────────────── */}
       <section className="hero">
         <HeroScene />
+        <HeroRainOverlay />
         <div className="hero-container">
           <div className="hero-title-wrap">
-            <h1 className="hero-title">We build AI products<br />that work</h1>
+            <h1 className="hero-title">Bathrooms built<br />to last</h1>
           </div>
           <p className="hero-subtitle">
-            Custom models. Full products. Total automation.<br />Whatever AI you need, we build it.
+            Bathrooms, kitchens, carpentry, plastering.<br />Whatever your home needs, we do it right.
           </p>
           <div className="hero-cta-wrap">
-            <a href="#contact" className="hero-cta">Start a Project <ArrowRight size={18} /></a>
+            <a href="#contact" className="hero-cta">Get a Free Quote <ArrowRight size={18} /></a>
           </div>
         </div>
       </section>
 
-      {/* ── Tech Ticker ──────────────────────────────── */}
+      {/* ── Materials Ticker ──────────────────────────── */}
       <div className="ticker-wrap">
         <div className="ticker-track">
-          {[...techStack, ...techStack].map((t, i) => (
-            <span key={i} className="ticker-item">{t}</span>
+          {[...materials, ...materials].map((m, i) => (
+            <span key={i} className="ticker-item">{m}</span>
           ))}
         </div>
       </div>
 
-      {/* ── Services ─────────────────────────────────── */}
+      {/* ── Services ──────────────────────────────────── */}
       <section id="services" className="services">
         <div className="services-container">
           <motion.div className="services-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -212,15 +222,15 @@ function App() {
         </div>
       </section>
 
-      {/* ── Use Cases ────────────────────────────────── */}
+      {/* ── Work Types ────────────────────────────────── */}
       <section className="use-cases">
         <div className="use-cases-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label">What we build</p>
-            <h2 className="section-title">If it runs on AI, we build it</h2>
+            <p className="section-label">What we do</p>
+            <h2 className="section-title">Bathrooms first. Home improvements too.</h2>
           </motion.div>
           <div className="use-cases-grid">
-            {useCases.map((u, i) => (
+            {workTypes.map((u, i) => (
               <motion.div key={i} className="use-case-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.07 }}>
                 <div className="use-case-icon">
                   <u.icon size={22} strokeWidth={1.5} />
@@ -233,17 +243,17 @@ function App() {
         </div>
       </section>
 
-      {/* ── Stats / 3D Section ───────────────────────── */}
+      {/* ── Stats ─────────────────────────────────────── */}
       <section className="stats">
         <StatsScene />
         <div className="stats-container">
           {[
-            { value: "Day 1", label: "Useful output from day one. No lengthy onboarding." },
-            { value: "Weeks", label: "Typical time from brief to working prototype" },
-            { value: "UK", label: "Based in the UK, working with businesses across Britain." },
-            { value: "24/7", label: "AI systems that work while you sleep" },
-            { value: "100%", label: "Founder-led. You talk directly to the people building it." },
-            { value: "Frontier", label: "GPT-4o, Claude, Gemini, Llama. Always the best model for the job." },
+            { value: "200+", label: "Bathrooms installed and handed over on time" },
+            { value: "10+",  label: "Years of trade experience in bathroom fitting" },
+            { value: "5★",   label: "Average customer rating across all reviews" },
+            { value: "1wk",  label: "Typical install time for a full bathroom refit" },
+            { value: "100%", label: "Fully managed - one team, no loose contractors" },
+            { value: "0",    label: "Hidden costs. Every quote is fixed-price upfront" },
           ].map((s, i) => (
             <motion.div key={i} className="stat-item" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.08 }}>
               <CounterStat value={s.value} label={s.label} />
@@ -253,12 +263,12 @@ function App() {
         </div>
       </section>
 
-      {/* ── Process ──────────────────────────────────── */}
+      {/* ── Process ───────────────────────────────────── */}
       <section className="process">
         <div className="process-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <p className="section-label">How we work</p>
-            <h2 className="section-title">From idea to live in weeks</h2>
+            <h2 className="section-title">From idea to installed</h2>
           </motion.div>
           <div className="process-grid">
             {process.map((p, i) => (
@@ -272,92 +282,66 @@ function App() {
         </div>
       </section>
 
-      {/* ── Mid-page CTA ─────────────────────────────── */}
+      {/* ── CTA Band ──────────────────────────────────── */}
       <section className="cta-band">
         <div className="cta-band-container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <h2 className="cta-band-title">Ready to cut costs<br />and build smarter?</h2>
-            <p className="cta-band-sub">One-off projects or ongoing retainers. No account managers. No nonsense.</p>
-            <a href="#contact" className="cta-band-btn">Get a free consultation <ArrowRight size={18} /></a>
+            <h2 className="cta-band-title">Ready for a bathroom<br />you'll love?</h2>
+            <p className="cta-band-sub">Fixed pricing. No hidden costs. Tidy, respectful team on every job.</p>
+            <a href="#contact" className="cta-band-btn">Get a free quote <ArrowRight size={18} /></a>
           </motion.div>
         </div>
       </section>
 
-      {/* ── Local Business ───────────────────────────── */}
-      <section id="local-business" className="local-biz">
-        <div className="local-biz-container">
-          <motion.div className="local-biz-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label local-biz-label">For UK local businesses</p>
-            <h2 className="local-biz-title">Something on your website<br />is costing you customers.</h2>
-            <p className="local-biz-intro">
-              Most local businesses we work with (dentists, gyms, roofers, electricians, salons) are losing 2 to 5 enquiries a week without knowing it. Slow site, not showing up on Google, no way to book out of hours. We audit your digital presence for free and tell you exactly what's happening. Then we fix it.
-            </p>
+      {/* ── Gallery ───────────────────────────────────── */}
+      <section id="gallery" className="gallery">
+        <div className="gallery-container">
+          <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <p className="section-label">Our work</p>
+            <h2 className="section-title">Recent projects</h2>
           </motion.div>
-
-          <div className="local-biz-steps">
+          <div className="gallery-grid">
             {[
-              {
-                n: "01",
-                title: "Free audit, 48 hours",
-                desc: "We look at your website speed, Google Business Profile, local search rankings, online booking, and reviews. You get a plain-English report back in 48 hours. No jargon, no obligation, no sales pitch."
-              },
-              {
-                n: "02",
-                title: "We fix what's broken",
-                desc: "Site too slow? We'll fix it. Not showing up on Google Maps? We'll sort your listing. No way for customers to book or enquire online? We'll build that. Every fix is priced upfront with no surprises."
-              },
-              {
-                n: "03",
-                title: "AI receptionist",
-                desc: "An AI that answers your phone, handles common questions, and books appointments, even at 11pm on a Sunday. You stop losing jobs to voicemail. Set up in a week, runs itself after that."
-              }
-            ].map((step, i) => (
-              <motion.div key={i} className="local-biz-step" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <div className="local-biz-step-num">{step.n}</div>
-                <h3 className="local-biz-step-title">{step.title}</h3>
-                <p className="local-biz-step-desc">{step.desc}</p>
+              { src: '/images/IMG_4581.jpeg', alt: 'Luxury black marble ensuite with LED shelves', large: true },
+              { src: '/images/IMG_4301.png',  alt: 'Onyx stone walk-in shower' },
+              { src: '/images/IMG_3767.jpeg', alt: 'Freestanding bath and walk-in shower' },
+              { src: '/images/IMG_3078.jpeg', alt: 'Modern dark grey ensuite' },
+              { src: '/images/IMG_4531.jpeg', alt: 'Contemporary fitted family bathroom' },
+              { src: '/images/IMG_4072.jpeg', alt: 'Walk-in shower with recessed niche' },
+              { src: '/images/IMG_3720.jpeg', alt: 'Cream marble shower enclosure' },
+              { src: '/images/IMG_4563.jpeg', alt: 'Modern cloakroom' },
+              { src: '/images/IMG_3410.jpeg', alt: 'Family bathroom with rainfall shower' },
+              { src: '/images/IMG_3085.jpeg', alt: 'Dark grey shower detail' },
+              { src: '/images/IMG_3256.jpeg', alt: 'Powder room with patterned floor tiles' },
+            ].map((img, i) => (
+              <motion.div
+                key={i}
+                className={`gallery-item${img.large ? ' gallery-item--large' : ''}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: (i % 4) * 0.08 }}
+              >
+                <img src={img.src} alt={img.alt} loading="lazy" />
               </motion.div>
             ))}
           </div>
-
-          <motion.div className="local-biz-pricing" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
-            <p className="local-biz-pricing-label">What it costs</p>
-            <div className="local-biz-pricing-grid">
-              {[
-                { service: "Digital audit + full report", price: "Free" },
-                { service: "Google listing fix + profile setup", price: "From £200" },
-                { service: "New website (fast, mobile, converts)", price: "From £1,500" },
-                { service: "AI receptionist", price: "From £300/month" },
-                { service: "SEO + ongoing maintenance", price: "From £200/month" },
-              ].map((row, i) => (
-                <div key={i} className="local-biz-pricing-row">
-                  <span className="local-biz-pricing-service">{row.service}</span>
-                  <span className="local-biz-pricing-price">{row.price}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div className="local-biz-cta" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <a href="#contact" className="local-biz-btn">Get your free audit <ArrowRight size={18} /></a>
-            <span className="local-biz-note">No commitment. 48-hour turnaround. Plain English results.</span>
-          </motion.div>
         </div>
       </section>
 
-      {/* ── Why Us ───────────────────────────────────── */}
+      {/* ── Why Us ────────────────────────────────────── */}
       <section className="why-us">
         <div className="why-us-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label">Why Shift AI Tech</p>
+            <p className="section-label">Why R4R</p>
             <h2 className="section-title">We're different</h2>
           </motion.div>
           <div className="why-grid">
             {[
-              { title: "UK-based, founder-run", desc: "We're a small UK team. When you contact us, you talk to the person who'll actually do the work. No handoffs, no account managers." },
-              { title: "We build the full stack", desc: "Custom models, automations, voice agents, full products, local business tools. We do all of it. You don't need five different agencies." },
-              { title: "Costs you'll actually like", desc: "We build lean. No enterprise bloat, no inflated margins. Pay per project, keep the value." },
-              { title: "Speed is the product", desc: "We've shipped working AI systems in days. When you need to move fast, we move fast." },
+              { title: "Fixed-price quotes",       desc: "We give you a clear price upfront and stick to it. No surprise costs at the end of the job." },
+              { title: "One team, start to finish", desc: "The same crew surveys, tiles, plumbs, and fits. No handoffs, no miscommunication between trades." },
+              { title: "We respect your home",      desc: "We hoover up daily, protect your floors, and treat your home as if it were our own." },
+              { title: "Trade-priced materials",    desc: "We pass on our trade discounts on tiles, sanitaryware, and fittings. You get better materials for less." },
             ].map((w, i) => (
               <motion.div key={i} className="why-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
                 <div className="why-dot" />
@@ -369,42 +353,42 @@ function App() {
         </div>
       </section>
 
-      {/* ── Scenarios ────────────────────────────────── */}
+      {/* ── Testimonials ──────────────────────────────── */}
       <section className="scenarios">
         <div className="scenarios-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label">Real problems we solve</p>
-            <h2 className="section-title">What this looks like in practice</h2>
+            <p className="section-label">What customers say</p>
+            <h2 className="section-title">Straight from the source</h2>
           </motion.div>
           <div className="scenarios-grid">
             {[
               {
-                type: "Local business",
-                problem: "A dental practice in Manchester had no online booking, a site that took 5 seconds to load on mobile, and three unanswered Google reviews. They had no idea how many enquiries they were losing.",
-                built: "We audited the site, fixed their Google Business Profile, integrated an online booking system, and set up an AI receptionist for out-of-hours calls.",
-                outcome: "£2,100 upfront. £300/month ongoing."
+                type: "Full bathroom refit",
+                problem: "Our bathroom was 20 years old - tired grout, a leaking shower tray, and a layout that made no sense. We'd had two other quotes that came back with hidden extras.",
+                built: "R4R surveyed on Monday, quoted the same day, and started the following week. Everything was stripped, waterproofed, tiled, and fitted in 6 days.",
+                outcome: "Exactly on quote. No surprises.",
               },
               {
-                type: "AI product",
-                problem: "A UK startup needed a recommendation engine to surface the right products to each visitor based on browsing behaviour — without a data science team to build or maintain it.",
-                built: "We built a RAG-based recommendation pipeline trained on their product catalogue and user data. Integrated directly into their existing platform with no infrastructure changes needed.",
-                outcome: "Delivered in under 3 weeks."
+                type: "Wet room installation",
+                problem: "We wanted to convert a small bathroom into a fully accessible wet room for my mother. The tricky part was the floor gradient and getting the drain in the right place.",
+                built: "They tanked the whole room, graded the floor perfectly, and even sorted the threshold so there's no trip hazard. The finish is immaculate.",
+                outcome: "Done in 5 days. Mum loves it.",
               },
               {
-                type: "Process automation",
-                problem: "A professional services firm had hundreds of client contracts in a shared drive. Finding key clauses, flagging renewals, and answering basic contract questions took hours of manual work every week.",
-                built: "We built a document AI pipeline that ingests their contracts, extracts key terms, flags upcoming renewals, and answers plain-English questions about any document instantly.",
-                outcome: "3+ hours saved per week from day one."
-              }
+                type: "En suite tiling",
+                problem: "We had the en suite fitted elsewhere but the tiler let us down - uneven grout lines, a crooked feature wall, and one cracked tile they just left in.",
+                built: "R4R came in, stripped all the bad tiles, and re-did the whole room properly. Large format porcelain, perfectly level, perfect grout lines.",
+                outcome: "Night and day difference.",
+              },
             ].map((s, i) => (
               <motion.div key={i} className="scenario-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
                 <div className="scenario-type">{s.type}</div>
                 <div className="scenario-block">
-                  <p className="scenario-label">The problem</p>
+                  <p className="scenario-label">The situation</p>
                   <p className="scenario-text">{s.problem}</p>
                 </div>
                 <div className="scenario-block">
-                  <p className="scenario-label">What we built</p>
+                  <p className="scenario-label">What we did</p>
                   <p className="scenario-text">{s.built}</p>
                 </div>
                 <div className="scenario-outcome">{s.outcome}</div>
@@ -414,27 +398,36 @@ function App() {
         </div>
       </section>
 
-      {/* ── Contact ──────────────────────────────────── */}
+      {/* ── Contact ───────────────────────────────────── */}
       <section id="contact" className="contact">
         <div className="contact-container">
           <motion.div className="contact-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <p className="section-label" style={{ color: '#888' }}>Contact</p>
-            <h2 className="contact-title">Let's build something</h2>
-            <p className="contact-subtitle">Tell us about your project and let's get to work.</p>
+            <h2 className="contact-title">Get a free quote</h2>
+            <p className="contact-subtitle">Tell us what you're after and we'll get back to you within 24 hours.</p>
           </motion.div>
           <div className="contact-content">
             <motion.div className="contact-info" initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               <div className="contact-item">
+                <Phone size={20} />
+                <a href="tel:+441234567890">Call us directly</a>
+              </div>
+              <div className="contact-item">
                 <Mail size={20} />
-                <a href="mailto:jack@shiftaitech.com">jack@shiftaitech.com</a>
+                <a href="mailto:info@r4rbathrooms.co.uk">info@r4rbathrooms.co.uk</a>
               </div>
               <div className="contact-item">
                 <MapPin size={20} />
-                <span>United Kingdom</span>
+                <span>Covering [your area] & surroundings</span>
               </div>
               <div className="contact-turnaround">
-                <Zap size={16} />
+                <Clock size={16} />
                 We respond within 24 hours
+              </div>
+              <div className="contact-reassurance">
+                <div className="reassurance-item"><ChevronRight size={14} /> Free no-obligation survey</div>
+                <div className="reassurance-item"><ChevronRight size={14} /> Fixed-price quote - no extras</div>
+                <div className="reassurance-item"><ChevronRight size={14} /> Fully insured tradespeople</div>
               </div>
             </motion.div>
             <motion.div className="contact-form-container" initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -442,31 +435,64 @@ function App() {
                 <form className="contact-form" onSubmit={handleSubmit}>
                   <div className="form-row">
                     <div className="form-group">
-                      <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Name" />
+                      <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Full name" />
                     </div>
                     <div className="form-group">
-                      <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Email" />
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required placeholder="Phone number" />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Email address" />
+                    </div>
+                    <div className="form-group">
+                      <input type="text" name="town" value={formData.town} onChange={handleChange} required placeholder="Town / City" />
                     </div>
                   </div>
                   <div className="form-group">
-                    <input type="text" name="company" value={formData.company} onChange={handleChange} placeholder="Company" />
+                    <select name="workRequired" value={formData.workRequired} onChange={handleChange} required className={formData.workRequired ? '' : 'select-placeholder'}>
+                      <option value="" disabled>Work required - select your project</option>
+                      <option value="Full bathroom installation">Full bathroom installation</option>
+                      <option value="Wet room / walk-in shower">Wet room / walk-in shower</option>
+                      <option value="En suite">En suite</option>
+                      <option value="Bathroom refurbishment">Bathroom refurbishment (refresh existing)</option>
+                      <option value="Tiling only">Tiling only</option>
+                      <option value="Plumbing only">Plumbing only</option>
+                      <option value="Kitchen fitting">Kitchen fitting</option>
+                      <option value="Carpentry / joinery">Carpentry / joinery</option>
+                      <option value="Plastering">Plastering</option>
+                      <option value="General home improvement">General home improvement</option>
+                      <option value="Multiple / not sure">Multiple works / not sure yet</option>
+                    </select>
                   </div>
                   <div className="form-group">
-                    <textarea name="message" value={formData.message} onChange={handleChange} required rows="5" placeholder="Tell us about your project" />
+                    <select name="budget" value={formData.budget} onChange={handleChange} required className={formData.budget ? '' : 'select-placeholder'}>
+                      <option value="" disabled>Budget - what are you looking to spend?</option>
+                      <option value="Under £3,000">Under £3,000</option>
+                      <option value="£3,000 – £5,000">£3,000 – £5,000</option>
+                      <option value="£5,000 – £8,000">£5,000 – £8,000</option>
+                      <option value="£8,000 – £12,000">£8,000 – £12,000</option>
+                      <option value="£12,000 – £20,000">£12,000 – £20,000</option>
+                      <option value="£20,000+">£20,000+</option>
+                      <option value="Not sure yet">Not sure yet - happy to discuss</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <textarea name="message" value={formData.message} onChange={handleChange} rows="4" placeholder="Anything else? Size of room, timescales, specific ideas - the more detail the better" />
                   </div>
                   <button type="submit" className="form-submit" disabled={formLoading}>
-                    {formLoading ? 'Sending…' : <><span>Send Message</span> <ArrowRight size={18} /></>}
+                    {formLoading ? 'Sending…' : <><span>Get My Free Quote</span> <ArrowRight size={18} /></>}
                   </button>
                   {formError && (
-                    <p className="form-error">Something went wrong. Please email us directly at <a href="mailto:jack@shiftaitech.com">jack@shiftaitech.com</a></p>
+                    <p className="form-error">Something went wrong. Please call us or email <a href="mailto:info@r4rbathrooms.co.uk">info@r4rbathrooms.co.uk</a></p>
                   )}
                 </form>
               ) : (
                 <motion.div className="form-success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
                   <CheckCircle2 size={48} />
-                  <h3>Message received</h3>
-                  <p>We'll get back to you within 24 hours.</p>
-                  <button onClick={() => { setFormSubmitted(false); setFormData({ name: '', email: '', company: '', message: '' }) }} className="form-reset">
+                  <h3>Enquiry received</h3>
+                  <p>We'll get back to you within 24 hours to arrange your free survey.</p>
+                  <button onClick={() => { setFormSubmitted(false); setFormData({ name: '', email: '', phone: '', town: '', workRequired: '', budget: '', message: '' }) }} className="form-reset">
                     Send another message
                   </button>
                 </motion.div>
@@ -479,8 +505,8 @@ function App() {
       {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
-          <div className="footer-logo">Shift AI Tech</div>
-          <p className="footer-text">© 2026 Shift AI Tech — United Kingdom</p>
+          <div className="footer-logo">Ready For Refurb</div>
+          <p className="footer-text">© 2026 Ready For Refurb. Fitted properly. Every time.</p>
         </div>
       </footer>
 

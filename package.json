@@ -1,5 +1,5 @@
 {
-  "name": "art-ai-website",
+  "name": "r4r-bathrooms",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -19,7 +19,7 @@
     "lucide-react": "^0.575.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "three": "^0.183.1",
+    "three": "^0.167.1",
     "zustand": "^5.0.11"
   },
   "devDependencies": {

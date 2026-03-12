@@ -1,0 +1,370 @@
+/* ─── Quote landing page ─────────────────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
+.qp-page {
+  min-height: 100vh;
+  background: #06090f;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.qp-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.qp-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.qp-brand {
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #3FB8E0 0%, #2980B9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+/* Main layout */
+.qp-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  max-width: 1160px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  align-items: start;
+}
+
+/* Left column */
+.qp-eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3FB8E0;
+  margin: 0 0 1rem;
+}
+
+.qp-title {
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin: 0 0 1.25rem;
+  color: #ffffff;
+}
+
+.qp-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.55);
+  margin: 0 0 2rem;
+  max-width: 420px;
+}
+
+/* Trust bullets */
+.qp-trust {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.qp-trust li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9375rem;
+  color: rgba(255,255,255,0.75);
+}
+
+.qp-trust li svg {
+  color: #3FB8E0;
+  flex-shrink: 0;
+}
+
+/* Mini gallery */
+.qp-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.qp-gallery-thumb {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.qp-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.qp-gallery-thumb:hover img {
+  transform: scale(1.05);
+}
+
+/* Right column — form card */
+.qp-right {
+  position: sticky;
+  top: 2rem;
+}
+
+.qp-form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  color: #0d1421;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+
+.qp-form-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.4rem;
+  color: #0d1421;
+}
+
+.qp-form-sub {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0 0 1.75rem;
+}
+
+.qp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.qp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.qp-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.qp-field input,
+.qp-field textarea,
+.qp-field select {
+  padding: 0.875rem 1rem;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #0d1421;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.qp-field input::placeholder,
+.qp-field textarea::placeholder {
+  color: #aaa;
+}
+
+.qp-field select.ph {
+  color: #aaa;
+}
+
+.qp-field select option {
+  color: #0d1421;
+}
+
+.qp-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-color: #f9fafb;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.qp-field input:focus,
+.qp-field textarea:focus,
+.qp-field select:focus {
+  outline: none;
+  border-color: #3FB8E0;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(63,184,224,0.12);
+}
+
+.qp-field textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.qp-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem 2rem;
+  background: #0d1421;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  width: 100%;
+  margin-top: 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.qp-submit:hover:not(:disabled) {
+  background: #3FB8E0;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(63,184,224,0.3);
+}
+
+.qp-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.qp-error {
+  font-size: 0.875rem;
+  color: #e53e3e;
+  text-align: center;
+  margin: 0;
+}
+
+/* Success state */
+.qp-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.qp-success-icon {
+  color: #3FB8E0;
+}
+
+.qp-success h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #0d1421;
+}
+
+.qp-success p {
+  font-size: 0.9375rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.qp-reset {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: transparent;
+  border: 1.5px solid #3FB8E0;
+  border-radius: 50px;
+  color: #3FB8E0;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qp-reset:hover {
+  background: #3FB8E0;
+  color: #fff;
+}
+
+/* Footer */
+.qp-footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.8125rem;
+  color: rgba(255,255,255,0.25);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .qp-main {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2.5rem 1.25rem;
+  }
+
+  .qp-right {
+    position: static;
+  }
+
+  .qp-gallery {
+    display: none;
+  }
+
+  .qp-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .qp-row {
+    grid-template-columns: 1fr;
+  }
+
+  .qp-form-card {
+    padding: 1.5rem 1.1rem;
+    border-radius: 16px;
+  }
+
+  .qp-form-title {
+    font-size: 1.3rem;
+  }
+
+  .qp-header {
+    padding: 1rem 1.1rem;
+  }
+
+  .qp-main {
+    padding: 1.75rem 1rem 2rem;
+  }
+
+  .qp-title {
+    font-size: 1.75rem;
+  }
+
+  .qp-submit {
+    font-size: 0.9375rem;
+    padding: 0.9rem 1.5rem;
+  }
+}
