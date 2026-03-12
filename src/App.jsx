@@ -29,7 +29,6 @@ import {
 import HeroScene from './HeroScene'
 import StatsScene from './StatsScene'
 import { CounterStat } from './components/CounterStat'
-import { HeroRainOverlay } from './components/HeroRainOverlay'
 import './App.css'
 
 function App() {
@@ -178,7 +177,6 @@ function App() {
       {/* ── Hero ──────────────────────────────────────── */}
       <section className="hero">
         <HeroScene />
-        <HeroRainOverlay />
         <div className="hero-container">
           <div className="hero-title-wrap">
             <h1 className="hero-title">Bathrooms built<br />to last</h1>

@@ -1,338 +1,456 @@
-import { useRef, useMemo, useEffect, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Points, PointMaterial } from '@react-three/drei'
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
+import { useEffect, useState } from 'react'
 import { useAppStore } from './store/useAppStore'
-import * as THREE from 'three'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared shader chunks
-// ─────────────────────────────────────────────────────────────────────────────
-const NOISE_GLSL = `
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-  }
-  float noise(vec2 p) {
-    vec2 i = floor(p); vec2 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-      mix(hash(i + vec2(0.0,1.0)), hash(i + vec2(1.0,1.0)), f.x), f.y
-    );
-  }
-  float fbm(vec2 p) {
-    float v = 0.0, a = 0.5;
-    for (int i = 0; i < 6; i++) { v += a * noise(p); p = p * 2.1 + vec2(3.1, 1.7); a *= 0.5; }
-    return v;
-  }
-`
+// ── Geometry ───────────────────────────────────────────────────────────────────
+const VW = 1000, VH = 580
+const HX = 110, HY = 55, HW = 780, HH = 470, WALL = 15
+const IX = HX + WALL        // 125  inner left
+const IY = HY + WALL        // 70   inner top
+const IR = HX + HW - WALL   // 875  inner right
+const IB = HY + HH - WALL   // 510  inner bottom
 
-const VERT = `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`
+const CX1 = 385  // left/mid column split
+const CX2 = 625  // mid/right column split
+const RY1 = 258  // top/bottom row split
 
-// ── Black marble (walls) ──────────────────────────────────────────────────────
-const blackMarbleFrag = `
-  uniform float uTime;
-  varying vec2 vUv;
-  ${NOISE_GLSL}
-  void main() {
-    vec2 uv = vUv * vec2(2.2, 3.0);
-    float t  = uTime * 0.007;
-    float n1 = fbm(uv + t);
-    float n2 = fbm(uv * 1.7 - t * 0.45 + vec2(n1 * 2.2, n1 * 0.7));
-    float n3 = fbm(uv * 0.4 + vec2(8.1, 3.5));
+// Room definitions
+const ROOMS = {
+  b1: { x: IX,  y: IY,  w: CX1-IX,  h: RY1-IY,  label: 'Bedroom 1',   floor: '#f3ece1', tile: false },
+  b2: { x: CX1, y: IY,  w: CX2-CX1, h: RY1-IY,  label: 'Bedroom 2',   floor: '#eee8dc', tile: false },
+  ba: { x: CX2, y: IY,  w: IR-CX2,  h: RY1-IY,  label: 'Bathroom',    floor: '#d4e8f5', tile: true  },
+  li: { x: IX,  y: RY1, w: CX1-IX,  h: IB-RY1,  label: 'Living Room', floor: '#ece7d3', tile: false },
+  ki: { x: CX1, y: RY1, w: CX2-CX1, h: IB-RY1,  label: 'Kitchen',     floor: '#f0e6d8', tile: true  },
+  es: { x: CX2, y: RY1, w: IR-CX2,  h: IB-RY1,  label: 'En Suite',    floor: '#bfdaf0', tile: true  },
+}
 
-    float vp1 = pow(max(sin(uv.x * 3.2 + n2 * 9.0 + n1 * 4.5) * 0.5 + 0.5, 0.0), 3.2);
-    float vp2 = pow(max(sin(uv.y * 2.1 + n1 * 5.5 + n3 * 2.8) * 0.5 + 0.5, 0.0), 4.5) * 0.5;
-    float veins = vp1 + vp2;
+const ROOM_LIST = Object.entries(ROOMS).map(([id, r]) => ({ id, ...r }))
 
-    vec3 base   = vec3(0.040, 0.042, 0.048);
-    vec3 midV   = vec3(0.22,  0.24,  0.27);
-    vec3 brightV= vec3(0.72,  0.75,  0.80);
+const rc = (id) => {
+  const r = ROOMS[id]
+  return r ? { x: r.x + r.w / 2, y: r.y + r.h / 2 } : { x: 0, y: 0 }
+}
 
-    vec3 col = mix(base, midV, min(veins * 0.6, 1.0));
-    col = mix(col, brightV, pow(vp1, 2.2) * 0.40);
-    col += (fbm(uv * 9.0 + 2.0) - 0.5) * 0.018;
+// ── Characters ─────────────────────────────────────────────────────────────────
+const CHARS = [
+  {
+    id: 'a', color: '#3FB8E0', head: '#f0c898', dark: '#1e6e8e',
+    route: ['ba', 'es'],
+    speech: ['Full rip-out. New tiles, new everything.', 'Walk-in wet room — serious impact.'],
+  },
+  {
+    id: 'b', color: '#e8784a', head: '#f5d0a0', dark: '#a04020',
+    route: ['ki', 'li'],
+    speech: ['New kitchen, new worktops. Let\'s sort it.', 'Bit of plastering and it\'s immaculate.'],
+  },
+  {
+    id: 'c', color: '#52c468', head: '#fad098', dark: '#286838',
+    route: ['b1', 'b2'],
+    speech: ['Built-in wardrobe. Does the room justice.', 'Skirting, cornicing — proper finish.'],
+  },
+]
 
-    gl_FragColor = vec4(col, 1.0);
-  }
-`
+// ── Furniture helper ───────────────────────────────────────────────────────────
+const F_FILL   = 'rgba(0,0,0,0.065)'
+const F_STROKE = 'rgba(0,0,0,0.18)'
+const F_SW     = 1
 
-// ── White / cream marble (floor) ──────────────────────────────────────────────
-const whiteMarbleFrag = `
-  uniform float uTime;
-  varying vec2 vUv;
-  ${NOISE_GLSL}
-  void main() {
-    vec2 uv = vUv * vec2(1.8, 1.8) + vec2(12.0, 7.0);
-    float t  = uTime * 0.005;
-    float n1 = fbm(uv + t);
-    float n2 = fbm(uv * 1.5 - t * 0.38 + vec2(n1 * 1.8, n1 * 0.9));
+function Rect({ x, y, w, h, rx = 2, fill = F_FILL, stroke = F_STROKE, sw = F_SW }) {
+  return <rect x={x} y={y} width={w} height={h} rx={rx} fill={fill} stroke={stroke} strokeWidth={sw} />
+}
 
-    float vp1 = pow(max(sin(uv.x * 2.8 + n2 * 7.5 + n1 * 3.8) * 0.5 + 0.5, 0.0), 3.5);
-    float vp2 = pow(max(sin(uv.y * 2.2 + n1 * 5.0) * 0.5 + 0.5, 0.0), 5.0) * 0.38;
-    float veins = vp1 + vp2;
-
-    vec3 base   = vec3(0.93, 0.91, 0.87);
-    vec3 vein1c = vec3(0.66, 0.63, 0.59);
-    vec3 vein2c = vec3(0.42, 0.40, 0.38);
-
-    vec3 col = mix(base, vein1c, min(veins * 0.55, 1.0));
-    col = mix(col, vein2c, pow(vp1, 2.5) * 0.28);
-    col += (fbm(uv * 6.5 + 1.3) - 0.5) * 0.012;
-
-    gl_FragColor = vec4(col, 1.0);
-  }
-`
-
-// ── Marble wall component (reused for back / left / right) ────────────────────
-function MarbleWall({ position, rotation, size = [20, 14], isFloor = false }) {
-  const matRef   = useRef()
-  const uniforms = useMemo(() => ({ uTime: { value: 0 } }), [])
-  useFrame(({ clock }) => {
-    if (matRef.current) matRef.current.uniforms.uTime.value = clock.getElapsedTime()
-  })
+function Bed({ x, y, w, h }) {
   return (
-    <mesh position={position} rotation={rotation}>
-      <planeGeometry args={[...size, 1, 1]} />
-      <shaderMaterial
-        ref={matRef}
-        vertexShader={VERT}
-        fragmentShader={isFloor ? whiteMarbleFrag : blackMarbleFrag}
-        uniforms={uniforms}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
+    <g>
+      <Rect x={x} y={y} w={w} h={h} rx={4} />
+      <Rect x={x} y={y} w={w} h={13} rx={2} fill="rgba(0,0,0,0.10)" />
+      <Rect x={x + 7} y={y + 18} w={w * 0.38} h={18} rx={9} fill="rgba(255,255,255,0.7)" />
+      <Rect x={x + w * 0.57} y={y + 18} w={w * 0.36} h={18} rx={9} fill="rgba(255,255,255,0.7)" />
+    </g>
   )
 }
 
-// ── Rain particles ─────────────────────────────────────────────────────────────
-function Rain() {
-  const ref      = useRef()
-  const count    = 3000
-  const OX = 0, OZ = -1.2, R = 2.0
-  const TOP = 3.8, BOT = -3.8
-
-  const pos = useMemo(() => {
-    const arr = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      const r = Math.random() * R, a = Math.random() * Math.PI * 2
-      arr[i * 3]     = OX + Math.cos(a) * r
-      arr[i * 3 + 1] = BOT + Math.random() * (TOP - BOT)
-      arr[i * 3 + 2] = OZ + Math.sin(a) * r * 0.35
-    }
-    return arr
-  }, [])
-
-  const spd = useMemo(() => {
-    const arr = new Float32Array(count)
-    for (let i = 0; i < count; i++) arr[i] = 0.05 + Math.random() * 0.04
-    return arr
-  }, [])
-
-  useFrame(() => {
-    for (let i = 0; i < count; i++) {
-      pos[i * 3 + 1] -= spd[i]
-      if (pos[i * 3 + 1] < BOT) {
-        const r = Math.random() * R, a = Math.random() * Math.PI * 2
-        pos[i * 3]     = OX + Math.cos(a) * r
-        pos[i * 3 + 1] = TOP
-        pos[i * 3 + 2] = OZ + Math.sin(a) * r * 0.35
-      }
-    }
-    ref.current.geometry.attributes.position.needsUpdate = true
-  })
-
+function Bath({ x, y, w, h }) {
   return (
-    <Points ref={ref} stride={3} frustumCulled>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" array={pos} count={count} itemSize={3} />
-      </bufferGeometry>
-      <PointMaterial transparent color="#d8eef8" size={0.015} sizeAttenuation depthWrite={false} opacity={0.72} />
-    </Points>
+    <g>
+      <Rect x={x} y={y} w={w} h={h} rx={6} fill="rgba(160,210,245,0.25)" />
+      <Rect x={x + 8} y={y + 8} w={w - 16} h={h - 16} rx={14} fill="rgba(160,210,245,0.35)" />
+      <circle cx={x + w - 16} cy={y + h - 14} r={5} fill="rgba(0,0,0,0.12)" stroke={F_STROKE} strokeWidth={0.8} />
+    </g>
   )
 }
 
-// ── Floor ripple rings — water landing in a circle ────────────────────────────
-const RING_COUNT = 7
-
-function FloorRipples() {
-  const rings   = useRef([])
-  const phases  = useMemo(() => Array.from({ length: RING_COUNT }, (_, i) => i / RING_COUNT), [])
-  const glowRef = useRef()
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-    rings.current.forEach((mesh, i) => {
-      if (!mesh) return
-      const phase   = (t * 0.42 + phases[i]) % 1
-      const scale   = 0.05 + phase * 5.5
-      const opacity = Math.max(0, 0.7 - phase * 0.75)
-      mesh.scale.setScalar(scale)
-      if (mesh.material) mesh.material.opacity = opacity
-    })
-    if (glowRef.current) {
-      glowRef.current.intensity = 5 + Math.sin(t * 3.0) * 2
-    }
-  })
-
+function Toilet({ x, y, w, h }) {
   return (
-    <group position={[0, -3.72, -1.2]} rotation={[-Math.PI / 2, 0, 0]}>
-      {phases.map((_, i) => (
-        <mesh key={i} ref={el => { rings.current[i] = el }}>
-          <ringGeometry args={[0.75, 1.0, 64]} />
-          <meshStandardMaterial
-            color="#88d8f4"
-            emissive="#88d8f4"
-            emissiveIntensity={3}
-            transparent opacity={0.6}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
-
-      {/* Glowing centre drain */}
-      <mesh>
-        <circleGeometry args={[0.28, 48]} />
-        <meshStandardMaterial color="#3FB8E0" emissive="#3FB8E0" emissiveIntensity={6} transparent opacity={1} />
-      </mesh>
-      <mesh>
-        <ringGeometry args={[0.28, 0.42, 48]} />
-        <meshStandardMaterial color="#c8eeff" emissive="#c8eeff" emissiveIntensity={4} transparent opacity={0.8} depthWrite={false} />
-      </mesh>
-
-      <pointLight ref={glowRef} position={[0, 0.3, 0]} intensity={6} color="#3FB8E0" distance={5} />
-    </group>
+    <g>
+      <Rect x={x} y={y} w={w} h={h * 0.42} rx={3} />
+      <ellipse cx={x + w / 2} cy={y + h * 0.73} rx={w / 2} ry={h * 0.3} fill={F_FILL} stroke={F_STROKE} strokeWidth={F_SW} />
+    </g>
   )
 }
 
-// ── Steam mist ─────────────────────────────────────────────────────────────────
-function Steam() {
-  const ref    = useRef()
-  const count  = 400
-  const origin = useMemo(() => {
-    const arr = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      arr[i * 3]     = (Math.random() - 0.5) * 4
-      arr[i * 3 + 1] = Math.random() * 7 - 4
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 2.5 - 1
-    }
-    return arr
-  }, [])
-  const pos = useMemo(() => Float32Array.from(origin), [origin])
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-    for (let i = 0; i < count; i++) {
-      pos[i * 3 + 1] += 0.002
-      if (pos[i * 3 + 1] > 4.5) pos[i * 3 + 1] = -4
-      pos[i * 3] = origin[i * 3] + Math.sin(t * 0.22 + i * 0.7) * 0.12
-    }
-    ref.current.geometry.attributes.position.needsUpdate = true
-  })
-
+function Sink({ x, y, w, h }) {
   return (
-    <Points ref={ref} stride={3} frustumCulled>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" array={pos} count={count} itemSize={3} />
-      </bufferGeometry>
-      <PointMaterial transparent color="#dde8ee" size={0.05} sizeAttenuation depthWrite={false} opacity={0.10} />
-    </Points>
+    <g>
+      <Rect x={x} y={y} w={w} h={h} rx={3} />
+      <ellipse cx={x + w / 2} cy={y + h / 2} rx={w * 0.33} ry={h * 0.33} fill="rgba(160,210,245,0.4)" stroke={F_STROKE} strokeWidth={0.8} />
+    </g>
   )
 }
 
-// ── Scene ready ────────────────────────────────────────────────────────────────
-function SceneReady() {
-  const setSceneLoaded = useAppStore((s) => s.setSceneLoaded)
-  useEffect(() => { setSceneLoaded() }, [])
-  return null
-}
-
-// ── Responsive camera — desktop looks into room, mobile sees wall not floor ────
-function Camera() {
-  const { camera } = useThree()
-
-  useEffect(() => {
-    const update = () => {
-      const mob = window.innerWidth < 768
-      camera.fov      = mob ? 78 : 68
-      camera.position.set(0, mob ? 1.5 : 0, mob ? 9.5 : 7.5)
-      camera.updateProjectionMatrix()
-    }
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [camera])
-
-  useFrame(({ clock, camera }) => {
-    const t   = clock.getElapsedTime()
-    const mob = window.innerWidth < 768
-    camera.position.x = Math.sin(t * 0.03) * 0.18
-    camera.position.y = (mob ? 1.5 : 0) + Math.cos(t * 0.025) * 0.08 + 0.2
-    camera.lookAt(0, mob ? 1.0 : 0.1, -1.5)
-  })
-  return null
-}
-
-// ── Main export — skip WebGL entirely on mobile ────────────────────────────────
-export default function HeroScene() {
-  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768)
-
-  useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 768)
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
-
-  if (!isDesktop) return null
-
+function Shower({ x, y, w, h }) {
   return (
-    <Canvas
-      camera={{ position: [0, 0, 7.5], fov: 68 }}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-      gl={{ antialias: true, alpha: false }}
-      dpr={[1, 2]}
+    <g>
+      <Rect x={x} y={y} w={w} h={h} fill="rgba(140,200,240,0.18)" rx={3} />
+      <line x1={x} y1={y} x2={x + w} y2={y + h} stroke={F_STROKE} strokeWidth={0.6} />
+      <line x1={x + w} y1={y} x2={x} y2={y + h} stroke={F_STROKE} strokeWidth={0.6} />
+      <circle cx={x + w * 0.72} cy={y + h * 0.28} r={5} fill="rgba(140,200,240,0.5)" stroke={F_STROKE} strokeWidth={0.8} />
+    </g>
+  )
+}
+
+function Sofa({ x, y, w, h }) {
+  return (
+    <g>
+      <Rect x={x} y={y} w={w} h={h} rx={5} fill="rgba(110,95,80,0.1)" />
+      <Rect x={x} y={y} w={16} h={h} rx={4} fill="rgba(110,95,80,0.16)" />
+      <Rect x={x + w - 16} y={y} w={16} h={h} rx={4} fill="rgba(110,95,80,0.16)" />
+      <Rect x={x} y={y} w={w} h={14} rx={4} fill="rgba(110,95,80,0.16)" />
+    </g>
+  )
+}
+
+function Wardrobe({ x, y, w, h }) {
+  return (
+    <g>
+      <Rect x={x} y={y} w={w} h={h} fill="rgba(0,0,0,0.09)" rx={2} />
+      <line x1={x + w / 2} y1={y + 2} x2={x + w / 2} y2={y + h - 2} stroke={F_STROKE} strokeWidth={0.8} />
+    </g>
+  )
+}
+
+// ── Character component ────────────────────────────────────────────────────────
+function Character({ char, pos, bubbleKey, speech }) {
+  return (
+    <g
+      className="char-g"
+      style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}
     >
-      <color attach="background" args={['#080a0d']} />
-      <ambientLight intensity={0.06} color="#b8ccda" />
+      {/* Drop shadow */}
+      <ellipse cx={3} cy={5} rx={16} ry={10} fill="rgba(0,0,0,0.18)" />
+      {/* Body */}
+      <circle cx={0} cy={0} r={16} fill={char.color} />
+      {/* Head */}
+      <circle cx={0} cy={-4} r={10} fill={char.head} />
+      {/* Hair dot */}
+      <circle cx={0} cy={-7} r={3.5} fill={char.dark} opacity={0.7} />
+      {/* Outline */}
+      <circle cx={0} cy={0} r={16} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} />
 
-      {/* Overhead shower spotlight - illuminates the falling rain */}
-      <spotLight
-        position={[0, 7, -1]}
-        angle={0.50}
-        penumbra={0.55}
-        intensity={35}
-        color="#c8e8f5"
-        castShadow={false}
-      />
-      {/* Warm fill from floor level - bounces off white floor */}
-      <pointLight position={[0, -4, 1]}   intensity={3.5} color="#f0ece4" distance={10} />
-      {/* Side fills */}
-      <pointLight position={[-5, 1, -1]}  intensity={1.5} color="#c8d8e0" distance={8} />
-      <pointLight position={[ 5, 1, -1]}  intensity={1.5} color="#c8d8e0" distance={8} />
+      {/* Speech bubble — key remount restarts animation */}
+      <g key={bubbleKey} className="bubble-anim" style={{ transformOrigin: '0px -30px' }}>
+        <g filter="url(#bubbleShadow)">
+          <rect x={-82} y={-100} width={164} height={52} rx={9}
+            fill="white" stroke="rgba(0,0,0,0.1)" strokeWidth={1} />
+          <polygon points="-8,-48 8,-48 0,-36" fill="white" stroke="rgba(0,0,0,0.1)" strokeWidth={0.5} />
+        </g>
+        <foreignObject x={-76} y={-97} width={152} height={46}>
+          <div xmlns="http://www.w3.org/1999/xhtml"
+            style={{ fontSize: '10.5px', fontFamily: 'Inter, sans-serif', fontWeight: 500, color: '#1a1a1a', lineHeight: 1.4, padding: '3px 0' }}>
+            {speech}
+          </div>
+        </foreignObject>
+      </g>
+    </g>
+  )
+}
 
-      <SceneReady />
+// ── Door arc helper ────────────────────────────────────────────────────────────
+function DoorArc({ cx, cy, r = 44, startAngle, endAngle }) {
+  const rad = (deg) => (deg * Math.PI) / 180
+  const x1 = cx + r * Math.cos(rad(startAngle))
+  const y1 = cy + r * Math.sin(rad(startAngle))
+  const x2 = cx + r * Math.cos(rad(endAngle))
+  const y2 = cy + r * Math.sin(rad(endAngle))
+  return (
+    <>
+      <line x1={cx} y1={cy} x2={x1} y2={y1} stroke="rgba(0,0,0,0.12)" strokeWidth={1} />
+      <path d={`M ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2}`}
+        fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth={1} strokeDasharray="3,2" />
+    </>
+  )
+}
 
-      {/* ── Room walls ── */}
-      <MarbleWall position={[0, 0.5, -5.5]} rotation={[0, 0, 0]}              size={[20, 14]} />
-      <MarbleWall position={[-5.5, 0.5, -2]} rotation={[0,  Math.PI / 2, 0]}  size={[12, 14]} />
-      <MarbleWall position={[ 5.5, 0.5, -2]} rotation={[0, -Math.PI / 2, 0]}  size={[12, 14]} />
-      <MarbleWall position={[0, -3.8, -2]}   rotation={[-Math.PI / 2, 0, 0]}  size={[14, 12]} isFloor />
-      <mesh position={[0, 5.2, -2]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[14, 12]} />
-        <meshStandardMaterial color="#e8eef2" roughness={0.9} metalness={0} side={THREE.DoubleSide} />
-      </mesh>
+// ── Tree cluster ───────────────────────────────────────────────────────────────
+function Trees({ cx, cy }) {
+  const colors = ['#0e2010', '#162c12', '#1c3818', '#122610', '#183214']
+  const blobs = [
+    [0, 0, 36], [-28, 18, 28], [24, 20, 30], [-10, -28, 24], [30, -18, 22],
+  ]
+  return (
+    <g>
+      {blobs.map(([dx, dy, r], i) => (
+        <circle key={i} cx={cx + dx} cy={cy + dy} r={r} fill={colors[i % colors.length]} opacity={0.92} />
+      ))}
+      {/* Highlight dot on top tree */}
+      <circle cx={cx} cy={cy - 10} r={6} fill="rgba(255,255,255,0.06)" />
+    </g>
+  )
+}
 
-      {/* ── Water ── */}
-      <Rain />
-      <Steam />
-      <FloorRipples />
+// ── Main scene ─────────────────────────────────────────────────────────────────
+export default function HeroScene() {
+  const setSceneLoaded = useAppStore((s) => s.setSceneLoaded)
+  const [isMobile, setIsMobile]     = useState(false)
+  const [hovered, setHovered]       = useState(null)
+  const [tick, setTick]             = useState(0)
 
-      <EffectComposer>
-        <Bloom intensity={1.8} luminanceThreshold={0.10} luminanceSmoothing={0.88} mipmapBlur />
-        <Vignette eskil={false} offset={0.25} darkness={0.65} />
-      </EffectComposer>
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 900)
+    const t = setTimeout(() => setSceneLoaded(), 400)
+    const id = setInterval(() => setTick(n => n + 1), 1000)
+    return () => { clearTimeout(t); clearInterval(id) }
+  }, [setSceneLoaded])
 
-      <Camera />
-    </Canvas>
+  if (isMobile) return null
+
+  const charData = CHARS.map((char, i) => {
+    const offset   = i * 3
+    const period   = 8
+    const roomIdx  = Math.floor((tick + offset) / period) % char.route.length
+    const phase    = (tick + offset) % period   // 0=just moved, 1-7=settled
+    const pos      = rc(char.route[roomIdx])
+    const speech   = char.speech[roomIdx % char.speech.length]
+    const bubbleKey = `${char.id}-${Math.floor((tick + offset) / period)}`
+    return { char, pos, phase, speech, bubbleKey }
+  })
+
+  // ── Horizontal divider wall segments (y = RY1) ─────────────────────────────
+  // Gaps (doors): b1↔li at x~218-290, b2↔ki at x~468-540, ba↔es at x~698-770
+  const hWallD = `M ${IX} ${RY1} L 215 ${RY1}  M 292 ${RY1} L 462 ${RY1}  M 538 ${RY1} L 695 ${RY1}  M 772 ${RY1} L ${IR} ${RY1}`
+  // Vertical divider CX1 (gaps: b1↔b2 at y~135-198, li↔ki at y~348-418)
+  const vWall1D = `M ${CX1} ${IY} L ${CX1} 132  M ${CX1} 200 L ${CX1} 345  M ${CX1} 420 L ${CX1} ${IB}`
+  // Vertical divider CX2 (gaps: b2↔ba at y~135-198, ki↔es at y~348-418)
+  const vWall2D = `M ${CX2} ${IY} L ${CX2} 132  M ${CX2} 200 L ${CX2} 345  M ${CX2} 420 L ${CX2} ${IB}`
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      <svg
+        viewBox={`0 0 ${VW} ${VH}`}
+        width="100%" height="100%"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ display: 'block' }}
+      >
+        <defs>
+          <style>{`
+            .char-g { transition: transform 1.8s cubic-bezier(0.4, 0, 0.2, 1); }
+            @keyframes bubbleIn {
+              0%   { opacity:0; transform:scale(.9) translateY(5px); }
+              20%  { opacity:1; transform:scale(1) translateY(0); }
+              78%  { opacity:1; transform:scale(1) translateY(0); }
+              100% { opacity:0; transform:scale(.95) translateY(-4px); }
+            }
+            .bubble-anim { animation: bubbleIn 8s ease forwards; transform-box: fill-box; }
+          `}</style>
+
+          {/* Tile grid */}
+          <pattern id="tiles" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+            <rect width="22" height="22" fill="transparent" />
+            <rect x=".5" y=".5" width="21" height="21" fill="rgba(255,255,255,0.04)" />
+            <line x1="0" y1="22" x2="22" y2="22" stroke="rgba(0,0,0,0.07)" strokeWidth=".6" />
+            <line x1="22" y1="0" x2="22" y2="22" stroke="rgba(0,0,0,0.07)" strokeWidth=".6" />
+          </pattern>
+
+          {/* Wood planks for bedrooms */}
+          <pattern id="wood" x="0" y="0" width="36" height="10" patternUnits="userSpaceOnUse">
+            <rect width="36" height="10" fill="transparent" />
+            <line x1="0" y1="10" x2="36" y2="10" stroke="rgba(0,0,0,0.04)" strokeWidth=".8" />
+          </pattern>
+
+          {/* Grass */}
+          <pattern id="grass" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+            <rect width="10" height="10" fill="#162e12" />
+            <circle cx="5" cy="5" r="1.8" fill="#112a0e" />
+            <circle cx="0" cy="0" r="1.2" fill="#1a341a" />
+            <circle cx="10" cy="10" r="1.2" fill="#132d12" />
+          </pattern>
+
+          {/* Bubble drop shadow */}
+          <filter id="bubbleShadow" x="-20%" y="-30%" width="145%" height="180%">
+            <feDropShadow dx="0" dy="4" stdDeviation="7" floodColor="rgba(0,0,0,0.22)" />
+          </filter>
+
+          {/* Room hover glow */}
+          <filter id="roomGlow" x="-5%" y="-5%" width="110%" height="110%">
+            <feGaussianBlur stdDeviation="6" result="b" />
+            <feComposite in="SourceGraphic" in2="b" operator="over" />
+          </filter>
+        </defs>
+
+        {/* ── Garden background ─────────────────────────────────────────────── */}
+        <rect x={0} y={0} width={VW} height={VH} fill="url(#grass)" />
+
+        {/* Path / driveway */}
+        <rect x={215} y={HY + HH} width={160} height={VH - HY - HH + 4} rx={4}
+          fill="#8a7b68" opacity={0.85} />
+        {/* Kerb lines */}
+        <line x1={215} y1={HY + HH} x2={215} y2={VH} stroke="#6e6358" strokeWidth={2} />
+        <line x1={375} y1={HY + HH} x2={375} y2={VH} stroke="#6e6358" strokeWidth={2} />
+
+        {/* Garden beds */}
+        <ellipse cx={72} cy={320} rx={42} ry={60} fill="#122510" opacity={0.6} />
+        <ellipse cx={928} cy={200} rx={38} ry={52} fill="#122510" opacity={0.55} />
+
+        {/* Tree clusters — corners and edges */}
+        <Trees cx={45}  cy={45}  />
+        <Trees cx={955} cy={42}  />
+        <Trees cx={42}  cy={538} />
+        <Trees cx={958} cy={536} />
+        <Trees cx={505} cy={30}  />
+        <Trees cx={68}  cy={200} />
+        <Trees cx={935} cy={340} />
+
+        {/* ── House footprint (walls) ────────────────────────────────────────── */}
+        <rect x={HX} y={HY} width={HW} height={HH} fill="#1e1c1a" rx={3} />
+
+        {/* ── Room floors ──────────────────────────────────────────────────── */}
+        {ROOM_LIST.map(room => (
+          <g key={room.id}
+            onMouseEnter={() => setHovered(room.id)}
+            onMouseLeave={() => setHovered(null)}
+            style={{ cursor: 'pointer' }}
+          >
+            {/* Base floor */}
+            <rect x={room.x} y={room.y} width={room.w} height={room.h} fill={room.floor} />
+            {/* Pattern overlay */}
+            <rect x={room.x} y={room.y} width={room.w} height={room.h}
+              fill={room.tile ? 'url(#tiles)' : 'url(#wood)'} opacity={0.9} />
+            {/* Hover highlight */}
+            {hovered === room.id && (
+              <rect x={room.x} y={room.y} width={room.w} height={room.h}
+                fill="rgba(63,184,224,0.12)" />
+            )}
+          </g>
+        ))}
+
+        {/* ── Furniture — Bedroom 1 ─────────────────────────────────────────── */}
+        <Bed       x={170} y={78}  w={148} h={96}  />
+        <Wardrobe  x={354} y={78}  w={22}  h={148} />
+        <Rect      x={162} y={78}  w={20}  h={20}  />
+        <Rect      x={323} y={78}  w={20}  h={20}  />
+        <Rect      x={130} y={195} w={230} h={48}  rx={6} fill="rgba(180,145,110,0.1)" stroke="rgba(0,0,0,0.07)" sw={1}/>
+
+        {/* ── Furniture — Bedroom 2 ─────────────────────────────────────────── */}
+        <Bed       x={420} y={78}  w={135} h={92}  />
+        <Wardrobe  x={390} y={78}  w={22}  h={148} />
+        <Rect      x={416} y={78}  w={19}  h={19}  />
+        <Rect      x={558} y={78}  w={19}  h={19}  />
+
+        {/* ── Furniture — Bathroom ─────────────────────────────────────────── */}
+        <Bath      x={632} y={76}  w={165} h={68}  />
+        <Toilet    x={820} y={76}  w={38}  h={55}  />
+        <Sink      x={820} y={140} w={40}  h={36}  />
+        <Shower    x={632} y={168} w={88}  h={78}  />
+
+        {/* ── Furniture — Living Room ───────────────────────────────────────── */}
+        <Rect      x={138} y={264} w={220} h={18}  fill="rgba(0,0,0,0.1)" />
+        {/* TV */}
+        <rect x={145} y={265} width={206} height={14} rx={2} fill="#111" opacity={0.7} />
+        <Sofa      x={132} y={462} w={238} h={44}  />
+        <Rect      x={170} y={395} w={120} h={52}  rx={4} fill="rgba(0,0,0,0.05)" />
+        <Rect      x={135} y={384} w={238} h={115} rx={8} fill="rgba(160,130,90,0.08)" stroke="rgba(0,0,0,0.06)" sw={1}/>
+
+        {/* ── Furniture — Kitchen ───────────────────────────────────────────── */}
+        <Rect      x={390} y={264} w={230} h={20}  />
+        <Rect      x={600} y={284} w={20}  h={220} />
+        <Rect      x={390} y={284} w={20}  h={220} />
+        {/* Island */}
+        <Rect      x={420} y={365} w={130} h={70}  rx={4} fill="rgba(180,158,128,0.15)" />
+        {/* Hob burners */}
+        {[0,1,2,3].map(i => (
+          <circle key={i} cx={430 + (i % 2) * 22} cy={275 + Math.floor(i / 2) * 16} r={5}
+            fill="rgba(0,0,0,0.12)" stroke={F_STROKE} strokeWidth={0.8} />
+        ))}
+
+        {/* ── Furniture — En Suite ─────────────────────────────────────────── */}
+        <Shower    x={630} y={263} w={148} h={132} />
+        <Toilet    x={820} y={263} w={40}  h={56}  />
+        <Sink      x={630} y={472} w={48}  h={34}  />
+        {/* Vanity unit */}
+        <Rect      x={627} y={468} w={200} h={38}  />
+
+        {/* ── Internal divider walls ────────────────────────────────────────── */}
+        {/* Horizontal */}
+        <path d={hWallD} fill="none" stroke="#1a1818" strokeWidth={WALL} strokeLinecap="butt" />
+        {/* Vertical */}
+        <path d={vWall1D} fill="none" stroke="#1a1818" strokeWidth={WALL} strokeLinecap="butt" />
+        <path d={vWall2D} fill="none" stroke="#1a1818" strokeWidth={WALL} strokeLinecap="butt" />
+
+        {/* ── Door arcs ─────────────────────────────────────────────────────── */}
+        <DoorArc cx={215} cy={RY1} r={42} startAngle={0}   endAngle={-90} />
+        <DoorArc cx={462} cy={RY1} r={42} startAngle={180} endAngle={-90} />
+        <DoorArc cx={695} cy={RY1} r={42} startAngle={0}   endAngle={-90} />
+        <DoorArc cx={CX1} cy={132} r={42} startAngle={90}  endAngle={0}   />
+        <DoorArc cx={CX2} cy={132} r={42} startAngle={90}  endAngle={0}   />
+        <DoorArc cx={CX1} cy={420} r={42} startAngle={90}  endAngle={0}   />
+        <DoorArc cx={CX2} cy={420} r={42} startAngle={90}  endAngle={0}   />
+
+        {/* ── Outer wall border ─────────────────────────────────────────────── */}
+        <rect x={HX} y={HY} width={HW} height={HH}
+          fill="none" stroke="#111" strokeWidth={WALL * 2} rx={2} />
+
+        {/* ── Room labels ──────────────────────────────────────────────────── */}
+        {ROOM_LIST.map(room => (
+          <text
+            key={room.id + '-lbl'}
+            x={room.x + room.w / 2}
+            y={room.y + room.h - 14}
+            textAnchor="middle"
+            fontSize={10}
+            fontWeight={600}
+            fontFamily="Inter, -apple-system, sans-serif"
+            letterSpacing="0.08em"
+            fill={hovered === room.id ? '#1e6e8e' : 'rgba(0,0,0,0.35)'}
+            style={{ textTransform: 'uppercase', userSelect: 'none', pointerEvents: 'none' }}
+          >
+            {room.label.toUpperCase()}
+          </text>
+        ))}
+
+        {/* ── Characters ───────────────────────────────────────────────────── */}
+        {charData.map(({ char, pos, speech, bubbleKey }) => (
+          <Character key={char.id} char={char} pos={pos} speech={speech} bubbleKey={bubbleKey} />
+        ))}
+
+        {/* ── Bottom gradient so hero text is readable ─────────────────────── */}
+        <defs>
+          <linearGradient id="heroFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor="#f8f5f0" stopOpacity="0" />
+            <stop offset="100%" stopColor="#f8f5f0" stopOpacity="0.92" />
+          </linearGradient>
+        </defs>
+        <rect x={0} y={VH * 0.55} width={VW} height={VH * 0.45} fill="url(#heroFade)" />
+
+        {/* Compass rose (top-right corner) */}
+        <g transform="translate(945, 90)" opacity={0.28}>
+          <circle cx={0} cy={0} r={18} fill="none" stroke="#1a1a1a" strokeWidth={1} />
+          <polygon points="0,-14 3,-4 0,-8 -3,-4" fill="#1a1a1a" />
+          <polygon points="0,14 3,4 0,8 -3,4"  fill="#1a1a1a" opacity={0.4} />
+          <polygon points="-14,0 -4,-3 -8,0 -4,3" fill="#1a1a1a" opacity={0.4} />
+          <polygon points="14,0 4,-3 8,0 4,3"  fill="#1a1a1a" opacity={0.4} />
+          <text x={0} y={-20} textAnchor="middle" fontSize={8} fontWeight={700}
+            fontFamily="Inter, sans-serif" fill="#1a1a1a">N</text>
+        </g>
+
+        {/* Scale bar */}
+        <g transform="translate(58, 540)" opacity={0.35}>
+          <line x1={0} y1={0} x2={80} y2={0} stroke="#1a1a1a" strokeWidth={2} />
+          <line x1={0} y1={-4} x2={0} y2={4} stroke="#1a1a1a" strokeWidth={1.5} />
+          <line x1={80} y1={-4} x2={80} y2={4} stroke="#1a1a1a" strokeWidth={1.5} />
+          <text x={40} y={-8} textAnchor="middle" fontSize={8} fontFamily="Inter, sans-serif" fill="#1a1a1a">5m</text>
+        </g>
+
+      </svg>
+    </div>
   )
 }
