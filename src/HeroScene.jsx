@@ -214,8 +214,8 @@ function MobileScene({ tick }) {
           <feDropShadow dx="0" dy="3" stdDeviation="6" floodColor="rgba(0,0,0,0.18)"/>
         </filter>
         <linearGradient id="mobFade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ece8e0" stopOpacity="0"/>
-          <stop offset="100%" stopColor="#ece8e0" stopOpacity="0.92"/>
+          <stop offset="0%" stopColor="#0a0e0c" stopOpacity="0"/>
+          <stop offset="100%" stopColor="#0a0e0c" stopOpacity="0.88"/>
         </linearGradient>
       </defs>
 
@@ -365,8 +365,8 @@ export default function HeroScene() {
             <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="rgba(0,0,0,0.2)" />
           </filter>
           <linearGradient id="heroFade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#f0ece4" stopOpacity="0" />
-            <stop offset="100%" stopColor="#f0ece4" stopOpacity="0.94" />
+            <stop offset="0%"   stopColor="#0a0e0c" stopOpacity="0" />
+            <stop offset="100%" stopColor="#0a0e0c" stopOpacity="0.88" />
           </linearGradient>
         </defs>
 
