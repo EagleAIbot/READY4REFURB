@@ -251,6 +251,38 @@ body {
   line-height: 1.1;
 }
 
+/* ─── Google Reviews Strip ───────────────────────── */
+.google-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.google-strip:hover { background: #f7f9ff; }
+
+.google-stars  { color: #f4b400; font-size: 1rem; letter-spacing: 0.05em; }
+.google-score  { font-weight: 700; font-size: 0.95rem; color: #111; }
+.google-divider{ color: #aaa; font-size: 0.9rem; }
+.google-count  { color: #444; font-size: 0.9rem; }
+.google-cta    { color: #3FB8E0; font-size: 0.88rem; font-weight: 600; margin-left: 0.4rem; }
+
+.google-reviews-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #3FB8E0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.google-reviews-link:hover { opacity: 0.75; }
+.google-reviews-link strong { color: #111; }
+
 /* ─── Materials Ticker ───────────────────────────── */
 .ticker-wrap {
   overflow: hidden;
