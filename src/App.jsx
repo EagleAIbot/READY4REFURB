@@ -59,7 +59,7 @@ function App() {
   useEffect(() => {
     if (!animationsReady) return
     const tl = gsap.timeline()
-    tl.fromTo('.hero-title',         { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 1,   ease: 'power3.out' })
+    tl.fromTo('.hero-title',         { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 1,   ease: 'power3.out' })
       .fromTo('.hero-cta-wrap',      { opacity: 0, y:  20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
       .fromTo('.hero-right-headline',{ opacity: 0, x:  40 }, { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out' }, '-=0.9')
       .fromTo('.hero-right-sub',     { opacity: 0, x:  40 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
@@ -180,14 +180,17 @@ function App() {
       {/* ── Hero ──────────────────────────────────────── */}
       <section className="hero">
         <HeroScene />
-        {/* Left — main headline */}
+        {/* Top — main headline */}
+        <div className="hero-top">
+          <h1 className="hero-title">Bathrooms built to last</h1>
+        </div>
+        {/* Bottom-left — CTA only */}
         <div className="hero-left">
-          <h1 className="hero-title">Bathrooms<br />built to last</h1>
           <div className="hero-cta-wrap">
             <a href="#contact" className="hero-cta">Get a Free Quote <ArrowRight size={18} /></a>
           </div>
         </div>
-        {/* Right — secondary message */}
+        {/* Bottom-right — secondary message */}
         <div className="hero-right">
           <p className="hero-right-headline">We don't just<br />do bathrooms.</p>
           <p className="hero-right-sub">Kitchens, carpentry,<br />plastering, tiling —<br />whatever it needs.</p>
