@@ -182,7 +182,7 @@ function App() {
         <HeroScene />
         {/* Bottom-left — headline + CTA */}
         <div className="hero-left">
-          <h1 className="hero-title">R4R<br />built to last</h1>
+          <h1 className="hero-title">Are<br />you<br />R4R?</h1>
           <div className="hero-cta-wrap">
             <a href="#contact" className="hero-cta">Get a Free Quote <ArrowRight size={18} /></a>
           </div>
