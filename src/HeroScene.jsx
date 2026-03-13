@@ -335,9 +335,9 @@ export default function HeroScene() {
   const vWall2 = `M ${CX2} ${IY} L ${CX2} 132  M ${CX2} 200 L ${CX2} 345  M ${CX2} 420 L ${CX2} ${IB}`
 
   return (
-    <div style={{ position: 'absolute', top: '16vh', left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <svg viewBox={`0 0 ${VW} ${VH}`} width="100%" height="100%"
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
 
         <defs>

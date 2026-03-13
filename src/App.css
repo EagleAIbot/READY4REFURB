@@ -121,28 +121,23 @@ body {
     background: #e8e4dc;
   }
 
-  .hero-top {
-    padding: 7vh 5% 2vh;
-  }
-
-  .hero-title {
-    font-size: clamp(1.8rem, 8vw, 2.8rem) !important;
-    white-space: normal !important;
-    color: #ffffff !important;
-  }
-
-  /* Button: centred at bottom on mobile */
   .hero-left {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 5vh;
+    bottom: 6vh;
+    max-width: 100%;
     text-align: center;
     padding: 0 1.5rem;
   }
 
   .hero-right {
     display: none;
+  }
+
+  .hero-title {
+    font-size: clamp(2.4rem, 10vw, 3.2rem) !important;
+    color: #ffffff !important;
   }
 
   .hero-cta {
@@ -152,25 +147,13 @@ body {
 }
 
 /* ── Hero panels ─────────────────────────────── */
-
-/* Title banner at the top of the hero */
-.hero-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  padding: 6vh 5% 3vh;
-  pointer-events: none;
-  /* dark fade behind title so it pops against any scene colour */
-  background: linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0) 100%);
-}
-
 .hero-left {
   position: absolute;
   left: 4%;
   bottom: 9vh;
   z-index: 2;
+  max-width: 360px;
+  text-align: left;
   pointer-events: none;
 }
 
@@ -210,13 +193,12 @@ body {
 }
 
 .hero-title {
-  font-size: clamp(2.8rem, 6.5vw, 5.5rem);
+  font-size: clamp(3.5rem, 9vw, 7rem);
   font-weight: 700;
   line-height: 1.0;
   letter-spacing: -0.04em;
-  margin-bottom: 0;
+  margin-bottom: 2rem;
   color: #ffffff;
-  white-space: nowrap;
 }
 
 .hero-subtitle {
