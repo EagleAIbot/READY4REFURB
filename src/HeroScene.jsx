@@ -183,11 +183,15 @@ const MOB_CLIENT_SPEECH = { bed: 'Bedroom could do with a wardrobe fit-out.', ba
 const MOB_CONTR_SPEECH  = { bed: 'Built-ins are our thing. Leave it to us.', bath: 'Not a problem — full refit, sorted.' }
 
 function MobileScene({ tick }) {
-  const PERIOD = 10
-  const clientIdx     = Math.floor(tick / PERIOD) % 2
-  const contractorIdx = 1 - clientIdx   // always opposite room
-  const clientRoom    = MOB_ROUTE[clientIdx]
-  const contractorRoom= MOB_ROUTE[contractorIdx]
+  const PERIOD = 12
+  const roomIdx    = Math.floor(tick / PERIOD) % 2
+  const currentRoom = MOB_ROUTE[roomIdx]
+  // Both in same room, side by side
+  const mobCenter  = MOB_POS[currentRoom]
+  const mClientPos = { x: mobCenter.x - 22, y: mobCenter.y }
+  const mContPos   = { x: mobCenter.x + 22, y: mobCenter.y }
+  const mClientKey = `mc-${roomIdx}`
+  const mContKey   = `mk-${roomIdx}-${tick % PERIOD >= 5 ? 1 : 0}`
 
   return (
     <svg viewBox={`0 0 ${MOB_VW} ${MOB_VH}`} width="100%" height="100%"
@@ -253,15 +257,14 @@ function MobileScene({ tick }) {
         </text>
       ))}
 
-      {/* Characters */}
+      {/* Characters — both in same room, client LEFT bubble, contractor RIGHT bubble */}
       {[
-        { char: MOB_CHARS[0], room: clientRoom,     speech: MOB_CLIENT_SPEECH[clientRoom],     key:`mc-${clientIdx}`,     right: clientRoom==='bed' },
-        { char: MOB_CHARS[1], room: contractorRoom, speech: MOB_CONTR_SPEECH[contractorRoom],  key:`mk-${contractorIdx}`, right: contractorRoom==='bath' },
-      ].map(({ char, room, speech, key, right }) => {
-        const pos = MOB_POS[room]
-        const bw = 155, bh = 48, bx = right ? 22 : -(bw + 22)
+        { char: MOB_CHARS[0], pos: mClientPos, speech: MOB_CLIENT_SPEECH[currentRoom], key: mClientKey,  right: false },
+        { char: MOB_CHARS[1], pos: mContPos,   speech: MOB_CONTR_SPEECH[currentRoom],  key: mContKey,    right: true  },
+      ].map(({ char, pos, speech, key, right }) => {
+        const bw = 145, bh = 48, bx = right ? 22 : -(bw + 22)
         return (
-          <g key={char.id} className="mob-char" style={{ transform:`translate(${pos.x}px, ${pos.y}px)` }}>
+          <g key={char.id} className="mob-char" style={{ transform:`translate(${pos.x}px, ${pos.y}px)`, willChange:'transform' }}>
             <ellipse cx={3} cy={5} rx={15} ry={9} fill="rgba(0,0,0,0.18)"/>
             <circle cx={0} cy={0} r={15} fill={char.color}/>
             <circle cx={0} cy={-4} r={9} fill={char.headColor}/>
@@ -311,16 +314,19 @@ export default function HeroScene() {
     )
   }
 
-  // ── Character positions: always 3 rooms apart (never overlap) ───────────────
-  const PERIOD = 10
-  const clientIdx      = Math.floor(tick / PERIOD) % ROUTE.length
-  const contractorIdx  = (clientIdx + 3) % ROUTE.length   // opposite side of route
-  const clientRoom     = ROUTE[clientIdx]
-  const contractorRoom = ROUTE[contractorIdx]
-  const clientPos      = rc(clientRoom)
-  const contractorPos  = rc(contractorRoom)
-  const clientKey      = `client-${clientIdx}`
-  const contractorKey  = `contractor-${contractorIdx}`
+  // ── Both in same room, side by side — client left, contractor right ──────────
+  const PERIOD = 12
+  const roomIdx    = Math.floor(tick / PERIOD) % ROUTE.length
+  const currentRoom = ROUTE[roomIdx]
+  const center     = rc(currentRoom)
+  // Side-by-side offset
+  const clientPos     = { x: center.x - 26, y: center.y }
+  const contractorPos = { x: center.x + 26, y: center.y }
+  // Client bubble restarts when room changes; contractor restarts halfway through
+  const clientKey      = `client-${roomIdx}`
+  const contractorKey  = `contractor-${roomIdx}-${tick % PERIOD >= 5 ? 1 : 0}`
+  const clientRoom     = currentRoom
+  const contractorRoom = currentRoom
 
   // ── Wall paths with door gaps ────────────────────────────────────────────────
   const hWall  = `M ${IX} ${RY1} L 215 ${RY1}  M 292 ${RY1} L 462 ${RY1}  M 538 ${RY1} L 695 ${RY1}  M 772 ${RY1} L ${IR} ${RY1}`
@@ -493,7 +499,7 @@ export default function HeroScene() {
             </text>
           ))}
 
-          {/* ── Client (blue, asks questions) ─────────────────────────────── */}
+          {/* ── Client (blue) — bubble always goes LEFT ──────────────────── */}
           <Character
             pos={clientPos}
             color="#3FB8E0"
@@ -502,10 +508,10 @@ export default function HeroScene() {
             hairSize={4}
             bubbleKey={clientKey}
             speech={CLIENT_SPEECH[clientRoom]}
-            bubbleRight={clientPos.x < 600}
+            bubbleRight={false}
           />
 
-          {/* ── Contractor (dark navy + dark hair, responds) ──────────────── */}
+          {/* ── Contractor (dark navy) — bubble always goes RIGHT ─────────── */}
           <Character
             pos={contractorPos}
             color="#1e2d40"
@@ -514,7 +520,7 @@ export default function HeroScene() {
             hairSize={9}
             bubbleKey={contractorKey}
             speech={CONTRACTOR_SPEECH[contractorRoom]}
-            bubbleRight={contractorPos.x >= 600}
+            bubbleRight={true}
           />
 
         </g>{/* end house group */}
