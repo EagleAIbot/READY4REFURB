@@ -164,18 +164,20 @@ function Trees({ cx, cy, scale=1 }) {
 }
 
 // ── Mobile: 2-room scene — bedroom on TOP, bathroom on BOTTOM ─────────────────
-const MOB_VW = 400, MOB_VH = 700
-const MHWALL_Y = 310, MHWALL_H = 16   // horizontal dividing wall
-const MOB_BED = { x: 0, y: 0,                    w: MOB_VW, h: MHWALL_Y,                    label: 'BEDROOM',  floor: '#f3ece1' }
-const MOB_BAT = { x: 0, y: MHWALL_Y + MHWALL_H,  w: MOB_VW, h: MOB_VH - MHWALL_Y - MHWALL_H, label: 'BATHROOM', floor: '#d4e8f5' }
+const MOB_VW = 460, MOB_VH = 820
+const MOP = 30                         // outer garden padding on all sides
+const MHWALL_Y = MOP + 305, MHWALL_H = 16
+const MROOM_W  = MOB_VW - MOP * 2
+const MOB_BED = { x: MOP, y: MOP,              w: MROOM_W, h: 305,                              label: 'BEDROOM',  floor: '#f3ece1' }
+const MOB_BAT = { x: MOP, y: MHWALL_Y+MHWALL_H, w: MROOM_W, h: MOB_VH - MOP - MHWALL_Y - MHWALL_H, label: 'BATHROOM', floor: '#d4e8f5' }
 const MOB_CHARS = [
   { id:'mc', color:'#3FB8E0', headColor:'#f5d0a8', hairColor:'#c89050', hairSize:4 },
   { id:'mk', color:'#1e2d40', headColor:'#d4956a', hairColor:'#1a1a1a', hairSize:9 },
 ]
 const MOB_ROUTE = ['bed', 'bath']
 const MOB_POS = {
-  bed:  { x: MOB_VW / 2, y: MOB_BED.y + MOB_BED.h * 0.55 },
-  bath: { x: MOB_VW / 2, y: MOB_BAT.y + MOB_BAT.h * 0.35 },
+  bed:  { x: MOB_VW / 2, y: MOB_BED.y  + MOB_BED.h  * 0.58 },
+  bath: { x: MOB_VW / 2, y: MOB_BAT.y  + MOB_BAT.h  * 0.32 },
 }
 const MOB_CLIENT_SPEECH = { bed: 'Built-in wardrobe here please.', bath: 'Full rip-out on this bathroom.' }
 const MOB_CONTR_SPEECH  = { bed: 'Built-ins are our thing.', bath: 'No problem — full refit.' }
@@ -191,7 +193,7 @@ function MobileScene({ tick }) {
   const mClientKey  = `mc-${roomIdx}`
   const mContKey    = `mk-${roomIdx}`
   const mShowCont   = mPhase >= 5
-  const BW = 140, BH = 42
+  const BW = 155, BH = 46
 
   return (
     <svg viewBox={`0 0 ${MOB_VW} ${MOB_VH}`} width="100%" height="100%"
@@ -214,68 +216,79 @@ function MobileScene({ tick }) {
           <rect width="36" height="10" fill="transparent"/>
           <line x1="0" y1="10" x2="36" y2="10" stroke="rgba(0,0,0,0.04)" strokeWidth=".8"/>
         </pattern>
-        <filter id="mbShadow" x="-20%" y="-30%" width="160%" height="200%">
+        <filter id="mbShadow" x="-20%" y="-30%" width="160%" height="220%">
           <feDropShadow dx="0" dy="2" stdDeviation="5" floodColor="rgba(0,0,0,0.18)"/>
         </filter>
         <linearGradient id="mobFade" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#0a0e0c" stopOpacity="0"/>
           <stop offset="100%" stopColor="#0a0e0c" stopOpacity="0.92"/>
         </linearGradient>
+        {/* Garden grass pattern */}
+        <radialGradient id="gardenBg" cx="50%" cy="50%" r="70%">
+          <stop offset="0%"   stopColor="#3a5c32"/>
+          <stop offset="100%" stopColor="#243d1e"/>
+        </radialGradient>
       </defs>
 
-      {/* Bedroom — top half, full width */}
-      <rect x={0} y={0} width={MOB_VW} height={MOB_BED.h} fill={MOB_BED.floor}/>
-      <rect x={0} y={0} width={MOB_VW} height={MOB_BED.h} fill="url(#mwood)" opacity={0.9}/>
+      {/* Garden background */}
+      <rect x={0} y={0} width={MOB_VW} height={MOB_VH} fill="url(#gardenBg)"/>
 
-      {/* Bathroom — bottom half, full width */}
-      <rect x={0} y={MOB_BAT.y} width={MOB_VW} height={MOB_BAT.h} fill={MOB_BAT.floor}/>
-      <rect x={0} y={MOB_BAT.y} width={MOB_VW} height={MOB_BAT.h} fill="url(#mtiles)" opacity={0.9}/>
+      {/* Outer wall (thick border around both rooms) */}
+      <rect x={MOP-8} y={MOP-8} width={MROOM_W+16} height={MOB_VH - MOP*2 + 16} fill="#1a1818" rx={4}/>
+
+      {/* Bedroom floor */}
+      <rect x={MOB_BED.x} y={MOB_BED.y} width={MOB_BED.w} height={MOB_BED.h} fill={MOB_BED.floor}/>
+      <rect x={MOB_BED.x} y={MOB_BED.y} width={MOB_BED.w} height={MOB_BED.h} fill="url(#mwood)" opacity={0.9}/>
+
+      {/* Bathroom floor */}
+      <rect x={MOB_BAT.x} y={MOB_BAT.y} width={MOB_BAT.w} height={MOB_BAT.h} fill={MOB_BAT.floor}/>
+      <rect x={MOB_BAT.x} y={MOB_BAT.y} width={MOB_BAT.w} height={MOB_BAT.h} fill="url(#mtiles)" opacity={0.9}/>
 
       {/* Horizontal dividing wall */}
-      <rect x={0} y={MHWALL_Y} width={MOB_VW} height={MHWALL_H} fill="#1a1818"/>
-      {/* Door gap in centre of wall */}
-      <rect x={MOB_VW/2 - 35} y={MHWALL_Y} width={70} height={MHWALL_H} fill={MOB_BED.floor}/>
+      <rect x={MOP} y={MHWALL_Y} width={MROOM_W} height={MHWALL_H} fill="#1a1818"/>
+      {/* Door gap */}
+      <rect x={MOB_VW/2 - 36} y={MHWALL_Y} width={72} height={MHWALL_H} fill={MOB_BED.floor}/>
 
-      {/* Bedroom furniture — spread across full width */}
-      <Bed      x={MOB_VW/2 - 80} y={20}  w={160} h={110}/>
-      <Wardrobe x={8}             y={20}  w={24}  h={160}/>
-      <Wardrobe x={MOB_VW - 32}  y={20}  w={24}  h={160}/>
+      {/* Bedroom furniture */}
+      <Bed      x={MOB_VW/2 - 85}     y={MOP + 18}  w={170} h={115}/>
+      <Wardrobe x={MOP + 4}           y={MOP + 18}  w={26}  h={165}/>
+      <Wardrobe x={MOP + MROOM_W - 30} y={MOP + 18} w={26}  h={165}/>
 
-      {/* Bathroom furniture — spread across full width */}
-      <Bath   x={12}             y={MOB_BAT.y + 10} w={MOB_VW - 24}    h={70}/>
-      <Toilet x={12}             y={MOB_BAT.y + 92} w={44}             h={60}/>
-      <Sink   x={72}             y={MOB_BAT.y + 92} w={48}             h={44}/>
-      <Shower x={MOB_VW - 170}  y={MOB_BAT.y + 92} w={158}            h={MOB_BAT.h - 108}/>
+      {/* Bathroom furniture */}
+      <Bath   x={MOB_BAT.x + 8}                y={MOB_BAT.y + 10} w={MROOM_W - 16}  h={72}/>
+      <Toilet x={MOB_BAT.x + 8}                y={MOB_BAT.y + 94} w={46}            h={62}/>
+      <Sink   x={MOB_BAT.x + 64}               y={MOB_BAT.y + 94} w={50}            h={46}/>
+      <Shower x={MOB_BAT.x + MROOM_W - 170}   y={MOB_BAT.y + 94} w={162}           h={MOB_BAT.h - 112}/>
 
       {/* Room labels */}
-      <text x={MOB_VW/2} y={MOB_BED.h - 14} textAnchor="middle" fontSize={9} fontWeight={700}
+      <text x={MOB_VW/2} y={MHWALL_Y - 12} textAnchor="middle" fontSize={9} fontWeight={700}
         letterSpacing="0.12em" fontFamily="Inter,-apple-system,sans-serif"
-        fill="rgba(0,0,0,0.25)" style={{ userSelect:'none' }}>BEDROOM</text>
-      <text x={MOB_VW/2} y={MOB_VH * 0.88} textAnchor="middle" fontSize={9} fontWeight={700}
+        fill="rgba(0,0,0,0.22)" style={{ userSelect:'none' }}>BEDROOM</text>
+      <text x={MOB_VW/2} y={MOB_VH * 0.87} textAnchor="middle" fontSize={9} fontWeight={700}
         letterSpacing="0.12em" fontFamily="Inter,-apple-system,sans-serif"
-        fill="rgba(255,255,255,0.3)" style={{ userSelect:'none' }}>BATHROOM</text>
+        fill="rgba(255,255,255,0.28)" style={{ userSelect:'none' }}>BATHROOM</text>
 
       {/* Characters — side by side, client LEFT bubble, contractor RIGHT bubble */}
       {[
         { char: MOB_CHARS[0], pos: mClientPos, speech: MOB_CLIENT_SPEECH[currentRoom], key: mClientKey, right: false, show: true      },
         { char: MOB_CHARS[1], pos: mContPos,   speech: MOB_CONTR_SPEECH[currentRoom],  key: mContKey,   right: true,  show: mShowCont },
       ].map(({ char, pos, speech, key, right, show }) => {
-        const bx = right ? 16 : -(BW + 16)
+        const bx = right ? 18 : -(BW + 18)
         return (
           <g key={char.id} className="mob-char" style={{ transform:`translate(${pos.x}px,${pos.y}px)`, willChange:'transform' }}>
-            <ellipse cx={2} cy={4} rx={12} ry={8} fill="rgba(0,0,0,0.18)"/>
-            <circle  cx={0} cy={0} r={12} fill={char.color}/>
-            <circle  cx={0} cy={-3} r={8} fill={char.headColor}/>
-            <ellipse cx={0} cy={-7} rx={char.hairSize*0.85} ry={char.hairSize*0.55} fill={char.hairColor} opacity={0.88}/>
-            <circle  cx={0} cy={0} r={12} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1}/>
+            <ellipse cx={2} cy={5} rx={14} ry={9} fill="rgba(0,0,0,0.18)"/>
+            <circle  cx={0} cy={0} r={14} fill={char.color}/>
+            <circle  cx={0} cy={-4} r={9} fill={char.headColor}/>
+            <ellipse cx={0} cy={-8} rx={char.hairSize} ry={char.hairSize*0.65} fill={char.hairColor} opacity={0.88}/>
+            <circle  cx={0} cy={0} r={14} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5}/>
             {show && (
               <g key={key} className="mob-bubble">
                 <g filter="url(#mbShadow)">
-                  <rect x={bx} y={-BH-22} width={BW} height={BH} rx={8} fill="white" stroke="rgba(0,0,0,0.07)" strokeWidth={1}/>
-                  <polygon points={`${right?bx+14:bx+BW-14},-22 ${right?bx+26:bx+BW-26},-22 ${right?bx+14:bx+BW-14},-10`} fill="white"/>
+                  <rect x={bx} y={-BH-24} width={BW} height={BH} rx={9} fill="white" stroke="rgba(0,0,0,0.07)" strokeWidth={1}/>
+                  <polygon points={`${right?bx+16:bx+BW-16},-24 ${right?bx+28:bx+BW-28},-24 ${right?bx+16:bx+BW-16},-12`} fill="white"/>
                 </g>
-                <foreignObject x={bx+8} y={-BH-20} width={BW-16} height={BH-4}>
-                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize:'9px', fontFamily:'Inter,sans-serif', fontWeight:500, color:'#1a1a1a', lineHeight:1.4 }}>
+                <foreignObject x={bx+9} y={-BH-22} width={BW-18} height={BH-4}>
+                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize:'9.5px', fontFamily:'Inter,sans-serif', fontWeight:500, color:'#1a1a1a', lineHeight:1.4 }}>
                     {speech}
                   </div>
                 </foreignObject>
@@ -286,7 +299,7 @@ function MobileScene({ tick }) {
       })}
 
       {/* Bottom fade for "Are you R4R?" text overlay */}
-      <rect x={0} y={MOB_VH*0.48} width={MOB_VW} height={MOB_VH*0.52} fill="url(#mobFade)"/>
+      <rect x={0} y={MOB_VH*0.5} width={MOB_VW} height={MOB_VH*0.5} fill="url(#mobFade)"/>
     </svg>
   )
 }
