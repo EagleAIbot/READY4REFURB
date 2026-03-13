@@ -197,7 +197,7 @@ function MobileScene({ tick }) {
 
   return (
     <svg viewBox={`0 0 ${MOB_VW} ${MOB_VH}`} width="100%" height="100%"
-      preserveAspectRatio="xMidYTop meet" xmlns="http://www.w3.org/2000/svg" style={{ display:'block', background:'#243d1e' }}>
+      preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display:'block' }}>
       <defs>
         <style>{`
           .mob-char { transition: transform 1.8s cubic-bezier(0.4,0,0.2,1); }
