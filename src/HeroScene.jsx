@@ -321,7 +321,7 @@ export default function HeroScene() {
   // ── Mobile: 2-room scene ───────────────────────────────────────────────────
   if (isMobile) {
     return (
-      <div style={{ position:'absolute', inset:0, overflow:'hidden', background:'#243d1e' }}>
+      <div style={{ position:'absolute', inset:0, overflow:'hidden', background:'#0a0e0c' }}>
         <MobileScene tick={tick} />
       </div>
     )
