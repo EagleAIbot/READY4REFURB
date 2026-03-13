@@ -102,42 +102,38 @@ function Wardrobe({ x, y, w, h }) {
 }
 
 // ── Character (top-down view) ──────────────────────────────────────────────────
-function Character({ pos, color, headColor, hairColor, hairSize, bubbleKey, speech, bubbleRight }) {
+// showBubble: when false the bubble is not mounted at all — mounting it triggers the CSS animation
+function Character({ pos, color, headColor, hairColor, hairSize, bubbleKey, speech, bubbleRight, showBubble = true }) {
   const bw = 170, bh = 56
   const bx = bubbleRight ? 20 : -(bw + 20)
   return (
     <g className="char-g" style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}>
-      {/* Shadow */}
       <ellipse cx={3} cy={5} rx={16} ry={10} fill="rgba(0,0,0,0.18)" />
-      {/* Body */}
       <circle cx={0} cy={0} r={16} fill={color} />
-      {/* Head */}
       <circle cx={0} cy={-4} r={10} fill={headColor} />
-      {/* Hair */}
       <ellipse cx={0} cy={-8} rx={hairSize} ry={hairSize * 0.65} fill={hairColor} opacity={0.88} />
-      {/* Subtle body outline */}
       <circle cx={0} cy={0} r={16} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} />
 
-      {/* Speech bubble — key remount restarts CSS animation */}
-      <g key={bubbleKey} className="bubble-anim" style={{ transformOrigin: `${bx + bw/2}px -32px` }}>
-        <g filter="url(#bubbleShadow)">
-          <rect x={bx} y={-bh - 28} width={bw} height={bh} rx={10}
-            fill="white" stroke="rgba(0,0,0,0.08)" strokeWidth={1} />
-          {/* Tail pointing down to character */}
-          <polygon
-            points={`${bubbleRight ? bx+18 : bx+bw-18},-28  ${bubbleRight ? bx+34 : bx+bw-34},-28  ${bubbleRight ? bx+18 : bx+bw-18},-14`}
-            fill="white"
-          />
+      {showBubble && (
+        <g key={bubbleKey} className="bubble-anim" style={{ transformOrigin: `${bx + bw/2}px -32px` }}>
+          <g filter="url(#bubbleShadow)">
+            <rect x={bx} y={-bh - 28} width={bw} height={bh} rx={10}
+              fill="white" stroke="rgba(0,0,0,0.08)" strokeWidth={1} />
+            <polygon
+              points={`${bubbleRight ? bx+18 : bx+bw-18},-28  ${bubbleRight ? bx+34 : bx+bw-34},-28  ${bubbleRight ? bx+18 : bx+bw-18},-14`}
+              fill="white"
+            />
+          </g>
+          <foreignObject x={bx+10} y={-bh-25} width={bw-20} height={bh-4}>
+            <div xmlns="http://www.w3.org/1999/xhtml" style={{
+              fontSize: '10.5px', fontFamily: 'Inter, -apple-system, sans-serif',
+              fontWeight: 500, color: '#1a1a1a', lineHeight: 1.45,
+            }}>
+              {speech}
+            </div>
+          </foreignObject>
         </g>
-        <foreignObject x={bx+10} y={-bh-25} width={bw-20} height={bh-4}>
-          <div xmlns="http://www.w3.org/1999/xhtml" style={{
-            fontSize: '10.5px', fontFamily: 'Inter, -apple-system, sans-serif',
-            fontWeight: 500, color: '#1a1a1a', lineHeight: 1.45,
-          }}>
-            {speech}
-          </div>
-        </foreignObject>
-      </g>
+      )}
     </g>
   )
 }
@@ -190,8 +186,10 @@ function MobileScene({ tick }) {
   const mobCenter  = MOB_POS[currentRoom]
   const mClientPos = { x: mobCenter.x - 22, y: mobCenter.y }
   const mContPos   = { x: mobCenter.x + 22, y: mobCenter.y }
-  const mClientKey = `mc-${roomIdx}`
-  const mContKey   = `mk-${roomIdx}-${tick % PERIOD >= 5 ? 1 : 0}`
+  const mPhase      = tick % PERIOD
+  const mClientKey  = `mc-${roomIdx}`
+  const mContKey    = `mk-${roomIdx}`
+  const mShowCont   = mPhase >= 5
 
   return (
     <svg viewBox={`0 0 ${MOB_VW} ${MOB_VH}`} width="100%" height="100%"
@@ -259,9 +257,9 @@ function MobileScene({ tick }) {
 
       {/* Characters — both in same room, client LEFT bubble, contractor RIGHT bubble */}
       {[
-        { char: MOB_CHARS[0], pos: mClientPos, speech: MOB_CLIENT_SPEECH[currentRoom], key: mClientKey,  right: false },
-        { char: MOB_CHARS[1], pos: mContPos,   speech: MOB_CONTR_SPEECH[currentRoom],  key: mContKey,    right: true  },
-      ].map(({ char, pos, speech, key, right }) => {
+        { char: MOB_CHARS[0], pos: mClientPos, speech: MOB_CLIENT_SPEECH[currentRoom], key: mClientKey, right: false, show: true       },
+        { char: MOB_CHARS[1], pos: mContPos,   speech: MOB_CONTR_SPEECH[currentRoom],  key: mContKey,   right: true,  show: mShowCont  },
+      ].map(({ char, pos, speech, key, right, show }) => {
         const bw = 145, bh = 48, bx = right ? 22 : -(bw + 22)
         return (
           <g key={char.id} className="mob-char" style={{ transform:`translate(${pos.x}px, ${pos.y}px)`, willChange:'transform' }}>
@@ -270,17 +268,19 @@ function MobileScene({ tick }) {
             <circle cx={0} cy={-4} r={9} fill={char.headColor}/>
             <ellipse cx={0} cy={-8} rx={char.hairSize} ry={char.hairSize*0.65} fill={char.hairColor} opacity={0.88}/>
             <circle cx={0} cy={0} r={15} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5}/>
-            <g key={key} className="mob-bubble">
-              <g filter="url(#mbShadow)">
-                <rect x={bx} y={-bh-24} width={bw} height={bh} rx={8} fill="white" stroke="rgba(0,0,0,0.08)" strokeWidth={1}/>
-                <polygon points={`${right?bx+16:bx+bw-16},-24 ${right?bx+28:bx+bw-28},-24 ${right?bx+16:bx+bw-16},-12`} fill="white"/>
+            {show && (
+              <g key={key} className="mob-bubble">
+                <g filter="url(#mbShadow)">
+                  <rect x={bx} y={-bh-24} width={bw} height={bh} rx={8} fill="white" stroke="rgba(0,0,0,0.08)" strokeWidth={1}/>
+                  <polygon points={`${right?bx+16:bx+bw-16},-24 ${right?bx+28:bx+bw-28},-24 ${right?bx+16:bx+bw-16},-12`} fill="white"/>
+                </g>
+                <foreignObject x={bx+8} y={-bh-21} width={bw-16} height={bh-4}>
+                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize:'9.5px', fontFamily:'Inter,sans-serif', fontWeight:500, color:'#1a1a1a', lineHeight:1.4 }}>
+                    {speech}
+                  </div>
+                </foreignObject>
               </g>
-              <foreignObject x={bx+8} y={-bh-21} width={bw-16} height={bh-4}>
-                <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize:'9.5px', fontFamily:'Inter,sans-serif', fontWeight:500, color:'#1a1a1a', lineHeight:1.4 }}>
-                  {speech}
-                </div>
-              </foreignObject>
-            </g>
+            )}
           </g>
         )
       })}
@@ -322,11 +322,12 @@ export default function HeroScene() {
   // Side-by-side offset
   const clientPos     = { x: center.x - 26, y: center.y }
   const contractorPos = { x: center.x + 26, y: center.y }
-  // Client bubble restarts when room changes; contractor restarts halfway through
-  const clientKey      = `client-${roomIdx}`
-  const contractorKey  = `contractor-${roomIdx}-${tick % PERIOD >= 5 ? 1 : 0}`
-  const clientRoom     = currentRoom
-  const contractorRoom = currentRoom
+  const phaseInRoom       = tick % PERIOD        // 0–11 within current room visit
+  const clientKey         = `client-${roomIdx}`
+  const contractorKey     = `contractor-${roomIdx}` // fresh key per room; only mounted when due
+  const showContractor    = phaseInRoom >= 5        // contractor silent for first 5s
+  const clientRoom        = currentRoom
+  const contractorRoom    = currentRoom
 
   // ── Wall paths with door gaps ────────────────────────────────────────────────
   const hWall  = `M ${IX} ${RY1} L 215 ${RY1}  M 292 ${RY1} L 462 ${RY1}  M 538 ${RY1} L 695 ${RY1}  M 772 ${RY1} L ${IR} ${RY1}`
@@ -511,7 +512,7 @@ export default function HeroScene() {
             bubbleRight={false}
           />
 
-          {/* ── Contractor (dark navy) — bubble always goes RIGHT ─────────── */}
+          {/* ── Contractor (dark navy) — waits 5s then responds RIGHT ──────── */}
           <Character
             pos={contractorPos}
             color="#1e2d40"
@@ -521,6 +522,7 @@ export default function HeroScene() {
             bubbleKey={contractorKey}
             speech={CONTRACTOR_SPEECH[contractorRoom]}
             bubbleRight={true}
+            showBubble={showContractor}
           />
 
         </g>{/* end house group */}
