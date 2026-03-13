@@ -173,7 +173,10 @@ function App() {
             <img src={img('r4r-logo.png')} alt="R4R" className="nav-logo-icon" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
             <span className="nav-logo-text">Ready For Refurb</span>
           </div>
-          <a href="#contact" className="nav-cta">Get a Quote</a>
+          <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
+            <a href={`${BASE}blog`} className="nav-blog-link">Advice</a>
+            <a href="#contact" className="nav-cta">Get a Quote</a>
+          </div>
         </div>
       </nav>
 
@@ -420,6 +423,33 @@ function App() {
                 <div className="scenario-outcome">{s.outcome}</div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Blog Teaser ───────────────────────────────── */}
+      <section className="blog-teaser">
+        <div className="blog-teaser-container">
+          <motion.div className="section-header" initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
+            <p className="section-label">From the team</p>
+            <h2 className="section-title">Renovation advice</h2>
+            <p className="section-subtitle">Practical guides on costs, materials and hiring the right people.</p>
+          </motion.div>
+          <div className="blog-teaser-grid">
+            {[
+              { title: 'How Much Does a Bathroom Renovation Cost in Northamptonshire?', slug: 'bathroom-renovation-cost-northamptonshire', cat: 'Costs & Budgeting' },
+              { title: 'Wet Room vs Walk-In Shower: Which Is Right for You?', slug: 'wet-room-vs-walk-in-shower', cat: 'Bathroom Advice' },
+              { title: 'How to Choose a Bathroom Fitter Near Towcester', slug: 'how-to-choose-bathroom-fitter-towcester', cat: 'Hiring Advice' },
+            ].map((p, i) => (
+              <motion.a key={i} href={`${BASE}blog/${p.slug}`} className="blog-teaser-card" initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5, delay: i*0.1 }}>
+                <span className="blog-teaser-cat">{p.cat}</span>
+                <h3 className="blog-teaser-title">{p.title}</h3>
+                <span className="blog-teaser-link">Read →</span>
+              </motion.a>
+            ))}
+          </div>
+          <div style={{ textAlign:'center', marginTop:'2.5rem' }}>
+            <a href={`${BASE}blog`} className="blog-teaser-all">View all articles →</a>
           </div>
         </div>
       </section>

@@ -77,6 +77,17 @@ body {
   background-clip: text;
 }
 
+.nav-blog-link {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-blog-link:hover { color: #fff; }
+.nav.scrolled .nav-blog-link { color: rgba(0,0,0,0.6); }
+.nav.scrolled .nav-blog-link:hover { color: #111; }
+
 .nav-cta {
   padding: 0.75rem 1.5rem;
   background: rgba(255, 255, 255, 0.15);
@@ -249,6 +260,64 @@ body {
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.1;
+}
+
+/* ─── Blog Teaser Section ────────────────────────── */
+.blog-teaser { padding: 8rem 0; background: #f8f7f5; }
+.blog-teaser-container { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
+.blog-teaser-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+
+.blog-teaser-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  text-decoration: none;
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.blog-teaser-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+
+.blog-teaser-cat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3FB8E0;
+  margin-bottom: 0.9rem;
+}
+
+.blog-teaser-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #111;
+  line-height: 1.4;
+  margin-bottom: 1.25rem;
+  flex: 1;
+}
+
+.blog-teaser-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3FB8E0;
+}
+
+.blog-teaser-all {
+  color: #111;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid #3FB8E0;
+  padding-bottom: 2px;
+  transition: color 0.2s;
+}
+.blog-teaser-all:hover { color: #3FB8E0; }
+
+@media (max-width: 900px) {
+  .blog-teaser-grid { grid-template-columns: 1fr; }
+  .blog-teaser-container { padding: 0 1.5rem; }
 }
 
 /* ─── Google Reviews Strip ───────────────────────── */
