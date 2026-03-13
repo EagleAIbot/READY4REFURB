@@ -163,33 +163,40 @@ function Trees({ cx, cy, scale=1 }) {
   </g>
 }
 
-// ── Mobile: 2-room scene (Bedroom + Bathroom side by side) ────────────────────
-const MOB_VW = 400, MOB_VH = 480
-const MOB_WALL = 12
-// Two rooms filling the viewBox with a thick dividing wall
-const MOB_BED = { x: MOB_WALL, y: MOB_WALL, w: 175, h: MOB_VH - MOB_WALL*2, label: 'BEDROOM', floor: '#f3ece1' }
-const MOB_BAT = { x: 213,      y: MOB_WALL, w: MOB_VW - 213 - MOB_WALL, h: MOB_VH - MOB_WALL*2, label: 'BATHROOM', floor: '#d4e8f5' }
+// ── Mobile: 2-room scene — full-bleed, each room fills half the screen ─────────
+const MOB_VW = 400, MOB_VH = 660
+// No outer border — rooms go edge to edge
+const MDIV_X = 192, MDIV_W = 16   // dividing wall position & thickness
+const MOB_BED = { x: 0,              y: 0, w: MDIV_X,                   h: MOB_VH, label: 'BEDROOM',  floor: '#f3ece1' }
+const MOB_BAT = { x: MDIV_X+MDIV_W, y: 0, w: MOB_VW - MDIV_X - MDIV_W, h: MOB_VH, label: 'BATHROOM', floor: '#d4e8f5' }
 const MOB_CHARS = [
   { id:'mc', color:'#3FB8E0', headColor:'#f5d0a8', hairColor:'#c89050', hairSize:4 },
   { id:'mk', color:'#1e2d40', headColor:'#d4956a', hairColor:'#1a1a1a', hairSize:9 },
 ]
 const MOB_ROUTE = ['bed', 'bath']
-const MOB_POS   = { bed: { x: MOB_BED.x + MOB_BED.w/2, y: MOB_VH/2 }, bath: { x: MOB_BAT.x + MOB_BAT.w/2, y: MOB_VH/2 } }
-const MOB_CLIENT_SPEECH = { bed: 'Bedroom could do with a wardrobe fit-out.', bath: 'This bathroom needs a full rip-out.' }
-const MOB_CONTR_SPEECH  = { bed: 'Built-ins are our thing. Leave it to us.', bath: 'Not a problem — full refit, sorted.' }
+// Characters placed at ~40% height so plenty of room above for bubble, below for text overlay
+const MOB_POS = {
+  bed:  { x: MOB_BED.x + MOB_BED.w/2,  y: MOB_VH * 0.42 },
+  bath: { x: MOB_BAT.x + MOB_BAT.w/2,  y: MOB_VH * 0.42 },
+}
+const MOB_CLIENT_SPEECH = { bed: 'Built-in wardrobe here please.', bath: 'Full rip-out on this bathroom.' }
+const MOB_CONTR_SPEECH  = { bed: 'Built-ins are our thing.', bath: 'No problem — full refit.' }
 
 function MobileScene({ tick }) {
   const PERIOD = 12
-  const roomIdx    = Math.floor(tick / PERIOD) % 2
+  const roomIdx     = Math.floor(tick / PERIOD) % 2
   const currentRoom = MOB_ROUTE[roomIdx]
-  // Both in same room, side by side
-  const mobCenter  = MOB_POS[currentRoom]
-  const mClientPos = { x: mobCenter.x - 22, y: mobCenter.y }
-  const mContPos   = { x: mobCenter.x + 22, y: mobCenter.y }
+  const mobCenter   = MOB_POS[currentRoom]
+  // Side-by-side: client left of centre, contractor right
+  const mClientPos  = { x: mobCenter.x - 18, y: mobCenter.y }
+  const mContPos    = { x: mobCenter.x + 18, y: mobCenter.y }
   const mPhase      = tick % PERIOD
   const mClientKey  = `mc-${roomIdx}`
   const mContKey    = `mk-${roomIdx}`
   const mShowCont   = mPhase >= 5
+
+  // Bubble width kept tight so it stays within the room even after slice-crop
+  const BW = 118, BH = 40
 
   return (
     <svg viewBox={`0 0 ${MOB_VW} ${MOB_VH}`} width="100%" height="100%"
@@ -198,8 +205,8 @@ function MobileScene({ tick }) {
         <style>{`
           .mob-char { transition: transform 1.8s cubic-bezier(0.4,0,0.2,1); }
           @keyframes mobBubble {
-            0%{opacity:0;transform:translateY(5px)}18%{opacity:1;transform:translateY(0)}
-            80%{opacity:1}100%{opacity:0;transform:translateY(-3px)}
+            0%{opacity:0;transform:translateY(4px)}18%{opacity:1;transform:translateY(0)}
+            78%{opacity:1}100%{opacity:0;transform:translateY(-3px)}
           }
           .mob-bubble { animation: mobBubble ${PERIOD}s ease forwards; }
         `}</style>
@@ -212,70 +219,70 @@ function MobileScene({ tick }) {
           <rect width="36" height="10" fill="transparent"/>
           <line x1="0" y1="10" x2="36" y2="10" stroke="rgba(0,0,0,0.04)" strokeWidth=".8"/>
         </pattern>
-        <filter id="mbShadow" x="-20%" y="-30%" width="150%" height="190%">
-          <feDropShadow dx="0" dy="3" stdDeviation="6" floodColor="rgba(0,0,0,0.18)"/>
+        <filter id="mbShadow" x="-20%" y="-30%" width="160%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="5" floodColor="rgba(0,0,0,0.18)"/>
         </filter>
         <linearGradient id="mobFade" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#0a0e0c" stopOpacity="0"/>
-          <stop offset="100%" stopColor="#0a0e0c" stopOpacity="0.88"/>
+          <stop offset="100%" stopColor="#0a0e0c" stopOpacity="0.92"/>
         </linearGradient>
       </defs>
 
-      {/* Outer wall */}
-      <rect x={0} y={0} width={MOB_VW} height={MOB_VH} fill="#1e1c1a"/>
-      {/* Bedroom floor */}
+      {/* Bedroom — full left half */}
       <rect x={MOB_BED.x} y={MOB_BED.y} width={MOB_BED.w} height={MOB_BED.h} fill={MOB_BED.floor}/>
       <rect x={MOB_BED.x} y={MOB_BED.y} width={MOB_BED.w} height={MOB_BED.h} fill="url(#mwood)" opacity={0.9}/>
-      {/* Bathroom floor */}
+
+      {/* Bathroom — full right half */}
       <rect x={MOB_BAT.x} y={MOB_BAT.y} width={MOB_BAT.w} height={MOB_BAT.h} fill={MOB_BAT.floor}/>
       <rect x={MOB_BAT.x} y={MOB_BAT.y} width={MOB_BAT.w} height={MOB_BAT.h} fill="url(#mtiles)" opacity={0.9}/>
 
       {/* Dividing wall */}
-      <rect x={190} y={MOB_WALL} width={22} height={MOB_VH - MOB_WALL*2} fill="#1a1818"/>
-      {/* Door gap in dividing wall */}
-      <rect x={190} y={MOB_VH/2 - 35} width={22} height={70} fill={MOB_BED.floor}/>
+      <rect x={MDIV_X} y={0} width={MDIV_W} height={MOB_VH} fill="#1a1818"/>
+      {/* Door gap */}
+      <rect x={MDIV_X} y={MOB_VH*0.38} width={MDIV_W} height={62} fill={MOB_BED.floor}/>
 
       {/* Bedroom furniture */}
-      <Bed x={MOB_BED.x + 25} y={MOB_BED.y + 18} w={125} h={88}/>
-      <Wardrobe x={MOB_BED.x + 5} y={MOB_BED.y + 120} w={20} h={130}/>
+      <Bed      x={MOB_BED.x + 20} y={20}   w={140} h={100}/>
+      <Wardrobe x={MOB_BED.x + 4}  y={135}  w={22}  h={140}/>
 
       {/* Bathroom furniture */}
-      <Bath   x={MOB_BAT.x + 8}  y={MOB_BAT.y + 12}  w={MOB_BAT.w - 16} h={65}/>
-      <Toilet x={MOB_BAT.x + 8}  y={MOB_BAT.y + 90}  w={38}             h={55}/>
-      <Sink   x={MOB_BAT.x + 55} y={MOB_BAT.y + 90}  w={42}             h={38}/>
-      <Shower x={MOB_BAT.x + 8}  y={MOB_BAT.y + 160} w={MOB_BAT.w - 20} h={MOB_VH - MOB_WALL*2 - 175}/>
+      <Bath   x={MOB_BAT.x + 6}  y={14}   w={MOB_BAT.w - 12} h={72}/>
+      <Toilet x={MOB_BAT.x + 6}  y={100}  w={42}             h={58}/>
+      <Sink   x={MOB_BAT.x + 58} y={100}  w={46}             h={42}/>
+      <Shower x={MOB_BAT.x + 6}  y={170}  w={MOB_BAT.w - 16} h={MOB_VH * 0.28}/>
 
       {/* Room labels */}
       {[MOB_BED, MOB_BAT].map((r, i) => (
-        <text key={i} x={r.x + r.w/2} y={r.y + r.h - 14}
-          textAnchor="middle" fontSize={9} fontWeight={700} letterSpacing="0.1em"
-          fontFamily="Inter,-apple-system,sans-serif" fill="rgba(0,0,0,0.28)"
+        <text key={i} x={r.x + r.w/2} y={MOB_VH * 0.88}
+          textAnchor="middle" fontSize={9} fontWeight={700} letterSpacing="0.12em"
+          fontFamily="Inter,-apple-system,sans-serif" fill="rgba(255,255,255,0.35)"
           style={{ userSelect:'none' }}>
           {r.label}
         </text>
       ))}
 
-      {/* Characters — both in same room, client LEFT bubble, contractor RIGHT bubble */}
+      {/* Characters */}
       {[
-        { char: MOB_CHARS[0], pos: mClientPos, speech: MOB_CLIENT_SPEECH[currentRoom], key: mClientKey, right: false, show: true       },
-        { char: MOB_CHARS[1], pos: mContPos,   speech: MOB_CONTR_SPEECH[currentRoom],  key: mContKey,   right: true,  show: mShowCont  },
+        { char: MOB_CHARS[0], pos: mClientPos, speech: MOB_CLIENT_SPEECH[currentRoom], key: mClientKey, right: true,  show: true      },
+        { char: MOB_CHARS[1], pos: mContPos,   speech: MOB_CONTR_SPEECH[currentRoom],  key: mContKey,   right: false, show: mShowCont },
       ].map(({ char, pos, speech, key, right, show }) => {
-        const bw = 145, bh = 48, bx = right ? 22 : -(bw + 22)
+        // Client bubble goes right (toward wall), contractor bubble goes left (toward wall) — both point inward
+        const bx = right ? 16 : -(BW + 16)
         return (
-          <g key={char.id} className="mob-char" style={{ transform:`translate(${pos.x}px, ${pos.y}px)`, willChange:'transform' }}>
-            <ellipse cx={3} cy={5} rx={15} ry={9} fill="rgba(0,0,0,0.18)"/>
-            <circle cx={0} cy={0} r={15} fill={char.color}/>
-            <circle cx={0} cy={-4} r={9} fill={char.headColor}/>
-            <ellipse cx={0} cy={-8} rx={char.hairSize} ry={char.hairSize*0.65} fill={char.hairColor} opacity={0.88}/>
-            <circle cx={0} cy={0} r={15} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5}/>
+          <g key={char.id} className="mob-char" style={{ transform:`translate(${pos.x}px,${pos.y}px)`, willChange:'transform' }}>
+            <ellipse cx={2} cy={4} rx={11} ry={7} fill="rgba(0,0,0,0.18)"/>
+            <circle  cx={0} cy={0} r={11} fill={char.color}/>
+            <circle  cx={0} cy={-3} r={7} fill={char.headColor}/>
+            <ellipse cx={0} cy={-6} rx={char.hairSize*0.8} ry={char.hairSize*0.5} fill={char.hairColor} opacity={0.88}/>
+            <circle  cx={0} cy={0} r={11} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1}/>
             {show && (
               <g key={key} className="mob-bubble">
                 <g filter="url(#mbShadow)">
-                  <rect x={bx} y={-bh-24} width={bw} height={bh} rx={8} fill="white" stroke="rgba(0,0,0,0.08)" strokeWidth={1}/>
-                  <polygon points={`${right?bx+16:bx+bw-16},-24 ${right?bx+28:bx+bw-28},-24 ${right?bx+16:bx+bw-16},-12`} fill="white"/>
+                  <rect x={bx} y={-BH-20} width={BW} height={BH} rx={7} fill="white" stroke="rgba(0,0,0,0.07)" strokeWidth={1}/>
+                  <polygon points={`${right?bx+14:bx+BW-14},-20 ${right?bx+24:bx+BW-24},-20 ${right?bx+14:bx+BW-14},-10`} fill="white"/>
                 </g>
-                <foreignObject x={bx+8} y={-bh-21} width={bw-16} height={bh-4}>
-                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize:'9.5px', fontFamily:'Inter,sans-serif', fontWeight:500, color:'#1a1a1a', lineHeight:1.4 }}>
+                <foreignObject x={bx+7} y={-BH-18} width={BW-14} height={BH-4}>
+                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize:'8.5px', fontFamily:'Inter,sans-serif', fontWeight:500, color:'#1a1a1a', lineHeight:1.4 }}>
                     {speech}
                   </div>
                 </foreignObject>
@@ -285,8 +292,8 @@ function MobileScene({ tick }) {
         )
       })}
 
-      {/* Bottom fade */}
-      <rect x={0} y={MOB_VH*0.52} width={MOB_VW} height={MOB_VH*0.48} fill="url(#mobFade)"/>
+      {/* Bottom fade for text overlay */}
+      <rect x={0} y={MOB_VH*0.5} width={MOB_VW} height={MOB_VH*0.5} fill="url(#mobFade)"/>
     </svg>
   )
 }
