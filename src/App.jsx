@@ -370,6 +370,16 @@ function App() {
                 when: "2 months ago",
                 text: "After a house move I recently had Ready For Refurb take out a bath and replace it with a large, tiled shower. From the very first contact they were professional and helpful throughout. The finished result is excellent and I have received many compliments. Would definitely recommend.",
               },
+              {
+                name: "Michelle Mitchell",
+                when: "1 month ago",
+                text: "Just had Ready for Refurb finish replacing our leaking shower with a brand new one! The guys did a fantastic job, were polite, friendly, kept everything clean and tidy. Work was top notch and of really good quality! Would definitely recommend them!!",
+              },
+              {
+                name: "Suzanne Halpin",
+                when: "5 months ago",
+                text: "Incredible service from start to finish. I've used Ready For Refurb to renovate a full bungalow also bathrooms and other rooms at my own home. The work is to such a high standard I can't recommend George and the team enough. Wouldn't use anyone else. Perfection along with trustworthy companies are hard to find but this is one.",
+              },
             ].map((r, i) => (
               <motion.div key={i} className="scenario-card review-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
                 <div className="review-stars">★★★★★</div>
