@@ -9,14 +9,6 @@ export const posts = [
     category: 'Costs & Budgeting',
     excerpt: 'From a straightforward re-tile to a full strip-out and refit, bathroom costs vary widely. Here\'s what you can realistically expect to pay in Northamptonshire in 2026.',
     content: `
-## The Short Answer
-
-A full bathroom renovation in Northamptonshire typically costs between **£4,500 and £12,000**, depending on the size of the room, the fixtures you choose, and the scope of work involved. A basic refresh (new suite, retile, replumb) sits at the lower end. A full luxury refit with underfloor heating, freestanding bath and large-format porcelain sits at the top.
-
-This guide breaks down the real numbers — not the optimistic figures you see on TV renovation shows.
-
----
-
 ## What Drives the Cost of a Bathroom Renovation?
 
 Before getting into numbers, it's worth understanding the main cost drivers:
@@ -28,10 +20,10 @@ Removing the old suite, tanking the walls and floors, and making good the plumbi
 Moving a toilet, repositioning a shower tray, or rerouting pipework adds significant cost. If your new layout matches the old one closely, you'll save money here.
 
 **3. Fixtures and fittings**
-A mid-range bathroom suite (bath, WC, basin, shower enclosure) from a reputable supplier costs £800–£2,500. Budget suites can be had for less, but the quality difference shows within a few years.
+A mid-range to premium bathroom suite (bath, WC, basin, shower enclosure) from a reputable supplier costs £2,000–£6,000+. Budget suites can be had for less, but the quality difference shows within a few years.
 
 **4. Tiling**
-Tiling is skilled, time-consuming work. A standard bathroom might take 2–3 days of tiling labour alone. Large-format tiles (600×600 or bigger) take longer to lay but look exceptional.
+Tiling is skilled, time-consuming work. A standard bathroom might take 2–3 days of tiling labour alone. The tile format, pattern, and surface area all affect the overall cost.
 
 **5. Finishing works**
 Plasterboarding, painting, fitting accessories, mirrors and lighting are often undercosted. Build in a proper contingency.
@@ -40,9 +32,9 @@ Plasterboarding, painting, fitting accessories, mirrors and lighting are often u
 
 ## Bathroom Renovation Cost by Type
 
-### Standard Full Bathroom Refit — £4,500 to £7,000
+### Standard Full Bathroom Refit — £8,000 to £12,000
 
-This covers a like-for-like replacement: same layout, new suite, full retile, new shower enclosure, replumbed and refitted. Typical timeline is 5–7 working days.
+This covers a like-for-like replacement: same layout, new suite, full retile, new shower enclosure, replumbed and refitted. Typical timeline is 2–3 weeks.
 
 What's included:
 - Full strip-out and disposal
@@ -52,11 +44,7 @@ What's included:
 - New radiator or towel rail
 - Plumbing and electrical first fix and second fix
 
-### En Suite Installation — £3,500 to £6,000
-
-En suites are typically smaller rooms, so labour costs are lower, but the compact space can make plumbing work more fiddly. Allow 4–6 days.
-
-### Wet Room — £5,000 to £9,000
+### Wet Room — £10,000 to £14,000+ (size dependent)
 
 Wet rooms require full tanking of walls and floors, a correctly graded screed bed, and a linear or centre drain. Done properly, they're virtually leak-proof and look outstanding. Done cheaply, they're a nightmare.
 
@@ -67,7 +55,7 @@ Key cost items:
 - Frameless glass screen
 - Wall-to-wall tiling
 
-### Luxury Bathroom Refit — £8,000 to £15,000+
+### Luxury Bathroom Refit — £12,000 to £16,000+
 
 At this level, you're looking at:
 - Freestanding bath (add £600–£2,500 for the bath alone)
@@ -89,7 +77,7 @@ Tradespeople rates in Northamptonshire (2026):
 - Electrician (Part P): £45–£65 per hour
 - Plasterer: £30–£45 per hour
 
-A full refit typically requires all four, often overlapping across a 5–8 day project.
+A full refit typically requires all four, often overlapping across a 10–15 day project.
 
 ---
 

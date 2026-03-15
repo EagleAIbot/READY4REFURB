@@ -28,7 +28,6 @@ import {
   Drill,
   LayoutDashboard,
 } from 'lucide-react'
-import HeroScene from './HeroScene'
 import StatsScene from './StatsScene'
 import { CounterStat } from './components/CounterStat'
 import './App.css'
@@ -40,7 +39,7 @@ function App() {
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState(false)
 
-  const { sceneLoaded, setAnimationsReady, setFinished } = useAppStore()
+  const { setSceneLoaded, setAnimationsReady, setFinished } = useAppStore()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -49,11 +48,11 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!sceneLoaded) return
+    setSceneLoaded()
     const t1 = setTimeout(() => setAnimationsReady(), 150)
     const t2 = setTimeout(() => setFinished(), 1000)
     return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [sceneLoaded])
+  }, [])
 
   const animationsReady = useAppStore((s) => s.animationsReady)
   useEffect(() => {
@@ -142,9 +141,8 @@ function App() {
     { icon: Layers,          title: "En Suites",             desc: "Compact en suites designed to maximise every centimetre of space" },
     { icon: Shield,          title: "Supply & Fit",          desc: "Trade-priced sanitaryware, furniture, and tiles sourced and fitted" },
     { icon: UtensilsCrossed, title: "Kitchen Fitting",       desc: "Full kitchen installations, worktops, splashbacks, and units" },
-    { icon: Hammer,          title: "Carpentry & Joinery",   desc: "Stud walls, boxing in, fitted furniture, and bespoke timber work" },
+    { icon: Hammer,          title: "Carpentry & Joinery",   desc: "Stud walls, boxing in, fitted furniture, skirting and architrave" },
     { icon: Brush,           title: "Plastering",            desc: "Full replasters, patching, and skim coats - ready for tiles or paint" },
-    { icon: LayoutDashboard, title: "Kitchens",              desc: "Measured, fitted, and finished - units, worktops, and all the detail" },
     { icon: Home,            title: "Home Improvements",     desc: "Refurbs, odd jobs, and property makeovers done properly" },
     { icon: Paintbrush,      title: "Design & Consult",      desc: "We help you plan the space, choose materials, and get it right first time" },
   ]
@@ -181,8 +179,11 @@ function App() {
       </nav>
 
       {/* ── Hero ──────────────────────────────────────── */}
-      <section className="hero">
-        <HeroScene />
+      <section className="hero hero-split">
+        {/* Split background photos */}
+        <div className="hero-split-left"  style={{ backgroundImage: `url(${img('bath-black-marble.png')})` }} />
+        <div className="hero-split-right" style={{ backgroundImage: `url(${img('bath-luxury-freestanding.png')})` }} />
+        <div className="hero-split-overlay" />
         {/* Bottom-left — headline + CTA */}
         <div className="hero-left">
           <h1 className="hero-title">Are<br />you<br /><span style={{ color: '#3FB8E0' }}>R4R?</span></h1>
@@ -227,33 +228,12 @@ function App() {
         </div>
       </div>
 
-      {/* ── Services ──────────────────────────────────── */}
-      <section id="services" className="services">
-        <div className="services-container">
-          <motion.div className="services-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label">Services</p>
-            <h2 className="services-title">What we do</h2>
-          </motion.div>
-          <div className="services-list">
-            {services.map((s, i) => (
-              <motion.div key={i} className="service-item" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <div className="service-number">{s.number}</div>
-                <div className="service-content">
-                  <h3 className="service-title">{s.title}</h3>
-                  <p className="service-description">{s.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Work Types ────────────────────────────────── */}
       <section className="use-cases">
         <div className="use-cases-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <p className="section-label">What we do</p>
-            <h2 className="section-title">Bathrooms first. Home improvements too.</h2>
+            <h2 className="section-title">Bathrooms and Home Improvement</h2>
           </motion.div>
           <div className="use-cases-grid">
             {workTypes.map((u, i) => (
@@ -274,10 +254,10 @@ function App() {
         <StatsScene />
         <div className="stats-container">
           {[
-            { value: "200+", label: "Bathrooms installed and handed over on time" },
+            { value: "100+", label: "Bathrooms installed and handed over on time" },
             { value: "10+",  label: "Years of trade experience in bathroom fitting" },
             { value: "5★",   label: "Average customer rating across all reviews" },
-            { value: "1wk",  label: "Typical install time for a full bathroom refit" },
+            { value: "2-3wk", label: "Typical install time for a full bathroom refit" },
             { value: "100%", label: "Fully managed - one team, no loose contractors" },
             { value: "0",    label: "Hidden costs. Every quote is fixed-price upfront" },
           ].map((s, i) => (
@@ -355,30 +335,6 @@ function App() {
         </div>
       </section>
 
-      {/* ── Why Us ────────────────────────────────────── */}
-      <section className="why-us">
-        <div className="why-us-container">
-          <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="section-label">Why R4R</p>
-            <h2 className="section-title">We're different</h2>
-          </motion.div>
-          <div className="why-grid">
-            {[
-              { title: "Fixed-price quotes",       desc: "We give you a clear price upfront and stick to it. No surprise costs at the end of the job." },
-              { title: "One team, start to finish", desc: "The same crew surveys, tiles, plumbs, and fits. No handoffs, no miscommunication between trades." },
-              { title: "We respect your home",      desc: "We hoover up daily, protect your floors, and treat your home as if it were our own." },
-              { title: "Trade-priced materials",    desc: "We pass on our trade discounts on tiles, sanitaryware, and fittings. You get better materials for less." },
-            ].map((w, i) => (
-              <motion.div key={i} className="why-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <div className="why-dot" />
-                <h3 className="why-title">{w.title}</h3>
-                <p className="why-desc">{w.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Testimonials ──────────────────────────────── */}
       <section className="scenarios">
         <div className="scenarios-container">
@@ -435,11 +391,9 @@ function App() {
             <h2 className="section-title">Renovation advice</h2>
             <p className="section-subtitle">Practical guides on costs, materials and hiring the right people.</p>
           </motion.div>
-          <div className="blog-teaser-grid">
+          <div className="blog-teaser-grid blog-teaser-grid--single">
             {[
               { title: 'How Much Does a Bathroom Renovation Cost in Northamptonshire?', slug: 'bathroom-renovation-cost-northamptonshire', cat: 'Costs & Budgeting' },
-              { title: 'Wet Room vs Walk-In Shower: Which Is Right for You?', slug: 'wet-room-vs-walk-in-shower', cat: 'Bathroom Advice' },
-              { title: 'How to Choose a Bathroom Fitter Near Towcester', slug: 'how-to-choose-bathroom-fitter-towcester', cat: 'Hiring Advice' },
             ].map((p, i) => (
               <motion.a key={i} href={`${BASE}blog/${p.slug}`} className="blog-teaser-card" initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5, delay: i*0.1 }}>
                 <span className="blog-teaser-cat">{p.cat}</span>

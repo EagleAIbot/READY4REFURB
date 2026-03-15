@@ -120,17 +120,62 @@ body {
 .hero {
   min-height: 100svh;
   position: relative;
-  background: #e8e4dc;
+  background: #111;
   overflow: hidden;
 }
 
 .hero::after { display: none; }
 
+/* ── Split photo hero ── */
+.hero-split-left,
+.hero-split-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background-size: cover;
+  background-position: center;
+}
+.hero-split-left  { left: 0; }
+.hero-split-right { right: 0; }
+
+.hero-split-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.25) 0%,
+    rgba(0,0,0,0.15) 40%,
+    rgba(0,0,0,0.65) 100%
+  );
+  z-index: 1;
+}
+
+/* thin divider line between the two photos */
+.hero-split-left::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: 2px;
+  background: rgba(255,255,255,0.18);
+  z-index: 2;
+}
+
 /* ── Mobile hero ── */
 @media (max-width: 900px) {
   .hero {
-    background: #e8e4dc;
+    background: #111;
   }
+
+  .hero-split-left,
+  .hero-split-right {
+    width: 100%;
+    height: 50%;
+    top: auto;
+    bottom: auto;
+  }
+  .hero-split-left  { top: 0; }
+  .hero-split-right { top: 50%; }
 
   .hero-left {
     position: absolute;
@@ -266,6 +311,7 @@ body {
 .blog-teaser { padding: 8rem 0; background: #f8f7f5; }
 .blog-teaser-container { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
 .blog-teaser-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+.blog-teaser-grid--single { grid-template-columns: minmax(0, 560px); justify-content: center; }
 
 .blog-teaser-card {
   display: flex;
