@@ -838,6 +838,42 @@ body {
   background: #141310;
 }
 
+/* ── Real review cards ── */
+.review-card { gap: 1.25rem; }
+
+.review-stars {
+  color: #f4b400;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.review-text {
+  font-size: 0.975rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.82);
+  flex: 1;
+}
+
+.review-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.review-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.review-when {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.35);
+}
+
 .scenario-type {
   display: inline-block;
   padding: 0.35rem 0.9rem;

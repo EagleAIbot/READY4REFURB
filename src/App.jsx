@@ -350,35 +350,33 @@ function App() {
           <div className="scenarios-grid">
             {[
               {
-                type: "Full bathroom refit",
-                problem: "Our bathroom was 20 years old - tired grout, a leaking shower tray, and a layout that made no sense. We'd had two other quotes that came back with hidden extras.",
-                built: "R4R surveyed on Monday, quoted the same day, and started the following week. Everything was stripped, waterproofed, tiled, and fitted in 6 days.",
-                outcome: "Exactly on quote. No surprises.",
+                name: "Goaty McGoatface",
+                when: "4 months ago",
+                text: "George and Kieran worked tirelessly for nearly 3 weeks to transform our bathroom from a 30 year old tired one to a stunning modern one. You cannot fault these guys and their attention to detail is amazing. I would not hesitate to recommend them or use them again.",
               },
               {
-                type: "Wet room installation",
-                problem: "We wanted to convert a small bathroom into a fully accessible wet room for my mother. The tricky part was the floor gradient and getting the drain in the right place.",
-                built: "They tanked the whole room, graded the floor perfectly, and even sorted the threshold so there's no trip hazard. The finish is immaculate.",
-                outcome: "Done in 5 days. Mum loves it.",
+                name: "Jack Rockell",
+                when: "3 months ago",
+                text: "Ready For Refurb absolutely lived up to their name. From day one they were on time, professional and easy to deal with. No messing around, no vague answers — just clear communication and proper graft. What really stood out was their eye for detail. They picked up little things I wouldn't even have noticed and just quietly sorted them. Edges, finishes, alignment — all the small touches that make the final result look premium. Great company, great people, and I'm honestly so happy with how everything's turned out. Would 100% recommend.",
               },
               {
-                type: "En suite tiling",
-                problem: "We had the en suite fitted elsewhere but the tiler let us down - uneven grout lines, a crooked feature wall, and one cracked tile they just left in.",
-                built: "R4R came in, stripped all the bad tiles, and re-did the whole room properly. Large format porcelain, perfectly level, perfect grout lines.",
-                outcome: "Night and day difference.",
+                name: "Andrew Tagg",
+                when: "5 months ago",
+                text: "So good we decided to have our third en-suite installed within months. George and his team are knowledgeable craftsmen, very tidy, polite, punctual. Could not recommend highly enough.",
               },
-            ].map((s, i) => (
-              <motion.div key={i} className="scenario-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <div className="scenario-type">{s.type}</div>
-                <div className="scenario-block">
-                  <p className="scenario-label">The situation</p>
-                  <p className="scenario-text">{s.problem}</p>
+              {
+                name: "Roger Frampton",
+                when: "2 months ago",
+                text: "After a house move I recently had Ready For Refurb take out a bath and replace it with a large, tiled shower. From the very first contact they were professional and helpful throughout. The finished result is excellent and I have received many compliments. Would definitely recommend.",
+              },
+            ].map((r, i) => (
+              <motion.div key={i} className="scenario-card review-card" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
+                <div className="review-stars">★★★★★</div>
+                <p className="review-text">"{r.text}"</p>
+                <div className="review-footer">
+                  <span className="review-name">{r.name}</span>
+                  <span className="review-when">{r.when} · Google</span>
                 </div>
-                <div className="scenario-block">
-                  <p className="scenario-label">What we did</p>
-                  <p className="scenario-text">{s.built}</p>
-                </div>
-                <div className="scenario-outcome">{s.outcome}</div>
               </motion.div>
             ))}
           </div>
