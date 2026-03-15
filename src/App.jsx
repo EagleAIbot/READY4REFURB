@@ -144,7 +144,6 @@ function App() {
     { icon: Hammer,          title: "Carpentry & Joinery",   desc: "Stud walls, boxing in, fitted furniture, skirting and architrave" },
     { icon: Brush,           title: "Plastering",            desc: "Full replasters, patching, and skim coats - ready for tiles or paint" },
     { icon: Home,            title: "Home Improvements",     desc: "Refurbs, odd jobs, and property makeovers done properly" },
-    { icon: Paintbrush,      title: "Design & Consult",      desc: "We help you plan the space, choose materials, and get it right first time" },
   ]
 
   const process = [
