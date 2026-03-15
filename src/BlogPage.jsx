@@ -23,7 +23,7 @@ export default function BlogPage() {
         </header>
 
         <div className="blog-grid">
-          {posts.map(post => (
+          {posts.filter(p => p.slug === 'bathroom-renovation-cost-northamptonshire').map(post => (
             <a key={post.slug} href={`${BASE}blog/${post.slug}`} className="blog-card">
               <div className="blog-card-meta">
                 <span className="blog-card-category">{post.category}</span>
