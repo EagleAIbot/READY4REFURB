@@ -425,11 +425,11 @@ function App() {
               </div>
               <div className="contact-item">
                 <Mail size={20} />
-                <a href="mailto:info@r4rbathrooms.co.uk">info@r4rbathrooms.co.uk</a>
+                <a href="mailto:ready4refurb@gmail.com">ready4refurb@gmail.com</a>
               </div>
               <div className="contact-item">
                 <MapPin size={20} />
-                <span>Covering [your area] & surroundings</span>
+                <span>Northamptonshire, Buckinghamshire & more</span>
               </div>
               <div className="contact-turnaround">
                 <Clock size={16} />
@@ -495,7 +495,7 @@ function App() {
                     {formLoading ? 'Sending…' : <><span>Get My Free Quote</span> <ArrowRight size={18} /></>}
                   </button>
                   {formError && (
-                    <p className="form-error">Something went wrong. Please call us or email <a href="mailto:info@r4rbathrooms.co.uk">info@r4rbathrooms.co.uk</a></p>
+                    <p className="form-error">Something went wrong. Please email <a href="mailto:ready4refurb@gmail.com">ready4refurb@gmail.com</a></p>
                   )}
                 </form>
               ) : (
