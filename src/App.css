@@ -126,18 +126,32 @@ body {
 
 .hero::after { display: none; }
 
-/* ── Split photo hero ── */
-.hero-split-left,
-.hero-split-right {
+/* ── Split photo hero (3 panels) ── */
+.hero-split {
+  display: flex;
+}
+
+.hero-split-panel {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 50%;
+  width: 33.333%;
   background-size: cover;
   background-position: center;
 }
-.hero-split-left  { left: 0; }
-.hero-split-right { right: 0; }
+.hero-split-panel:nth-child(1) { left: 0; }
+.hero-split-panel:nth-child(2) { left: 33.333%; }
+.hero-split-panel:nth-child(3) { left: 66.666%; }
+
+/* thin divider lines between panels */
+.hero-split-panel:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: 2px;
+  background: rgba(255,255,255,0.2);
+  z-index: 2;
+}
 
 .hero-split-overlay {
   position: absolute;
@@ -151,31 +165,20 @@ body {
   z-index: 1;
 }
 
-/* thin divider line between the two photos */
-.hero-split-left::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; right: 0;
-  width: 2px;
-  background: rgba(255,255,255,0.18);
-  z-index: 2;
-}
-
 /* ── Mobile hero ── */
 @media (max-width: 900px) {
   .hero {
     background: #111;
   }
 
-  .hero-split-left,
-  .hero-split-right {
+  .hero-split-panel {
     width: 100%;
-    height: 50%;
-    top: auto;
-    bottom: auto;
+    height: 33.333%;
+    left: 0 !important;
   }
-  .hero-split-left  { top: 0; }
-  .hero-split-right { top: 50%; }
+  .hero-split-panel:nth-child(1) { top: 0; }
+  .hero-split-panel:nth-child(2) { top: 33.333%; }
+  .hero-split-panel:nth-child(3) { top: 66.666%; }
 
   .hero-left {
     position: absolute;

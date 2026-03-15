@@ -180,9 +180,10 @@ function App() {
 
       {/* ── Hero ──────────────────────────────────────── */}
       <section className="hero hero-split">
-        {/* Split background photos */}
-        <div className="hero-split-left"  style={{ backgroundImage: `url(${img('bath-black-marble.png')})` }} />
-        <div className="hero-split-right" style={{ backgroundImage: `url(${img('bath-luxury-freestanding.png')})` }} />
+        {/* Three-panel background photos */}
+        <div className="hero-split-panel" style={{ backgroundImage: `url(${img('hero-grey-shower.png')})` }} />
+        <div className="hero-split-panel" style={{ backgroundImage: `url(${img('hero-kitchen.png')})` }} />
+        <div className="hero-split-panel" style={{ backgroundImage: `url(${img('hero-led-mirror.png')})` }} />
         <div className="hero-split-overlay" />
         {/* Bottom-left — headline + CTA */}
         <div className="hero-left">
