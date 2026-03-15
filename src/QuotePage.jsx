@@ -72,9 +72,9 @@ export default function QuotePage() {
 
           <div className="qp-gallery">
             {[
-              `${import.meta.env.BASE_URL}images/hero-grey-shower.png`,
-              `${import.meta.env.BASE_URL}images/hero-kitchen.png`,
-              `${import.meta.env.BASE_URL}images/hero-led-mirror.png`,
+              `${import.meta.env.BASE_URL}images/quote-bath-1.png`,
+              `${import.meta.env.BASE_URL}images/quote-bath-2.png`,
+              `${import.meta.env.BASE_URL}images/quote-bath-3.png`,
             ].map((src, i) => (
               <div key={i} className="qp-gallery-thumb">
                 <img src={src} alt="R4R bathroom project" loading="lazy" />
