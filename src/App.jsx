@@ -321,6 +321,7 @@ function App() {
               { src: img('IMG_3410.jpeg'), alt: 'Family bathroom with rainfall shower' },
               { src: img('IMG_3085.jpeg'), alt: 'Dark grey shower detail' },
               { src: img('IMG_3256.jpeg'), alt: 'Powder room with patterned floor tiles' },
+              { src: img('bath-grey-ensuite.png'), alt: 'Grey tiled en suite with walk-in shower' },
             ].map((img, i) => (
               <motion.div
                 key={i}
