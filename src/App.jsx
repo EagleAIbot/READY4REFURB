@@ -202,8 +202,7 @@ function App() {
 
       {/* ── Google Reviews Strip ─────────────────────── */}
       <a
-        href="https://www.google.com/search?q=Ready+For+Refurb+LTD+reviews"
-        target="_blank" rel="noopener noreferrer"
+        href="#reviews"
         className="google-strip"
       >
         {/* Google G */}
@@ -339,7 +338,7 @@ function App() {
       </section>
 
       {/* ── Testimonials ──────────────────────────────── */}
-      <section className="scenarios">
+      <section id="reviews" className="scenarios">
         <div className="scenarios-container">
           <motion.div className="section-header" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <p className="section-label">What customers say</p>
