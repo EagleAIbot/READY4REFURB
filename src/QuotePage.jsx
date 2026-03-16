@@ -16,7 +16,7 @@ export default function QuotePage() {
     setFormLoading(true)
     setFormError(false)
     try {
-      const res = await fetch('https://formsubmit.co/ajax/ready4refurb@gmail.com', {
+      const res = await fetch('https://formsubmit.co/ajax/info@battleplanmedia.co.uk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(formData),
